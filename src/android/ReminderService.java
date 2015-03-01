@@ -27,7 +27,7 @@ public class ReminderService extends IntentService implements LocationListener, 
 	
 	private String title;
 	private String content;
-	private double distance;
+	private float distance;
 	private long interval;
 	
 	private float radiusDistance;
