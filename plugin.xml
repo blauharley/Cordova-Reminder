@@ -37,12 +37,12 @@
         <source-file src="src/android/ReminderService.java" target-dir="src/com/phonegap/reminder" />
 		<source-file src="src/android/RunningInterface.java" target-dir="src/com/phonegap/reminder" />
 
-		<source-file src="src/android/icon/drawable-mdpi/ic_billclick_large.png" target-dir="res/drawable" />
+		<resource-file src="src/android/icon/drawable-mdpi/ic_billclick_large.png" target="res/drawable/ic_billclick_large.png" />
 		
-		<source-file src="src/android/icon/drawable-hdpi/ic_billclick_large.png" target-dir="res/drawable-hdpi" />
-		<source-file src="src/android/icon/drawable-mdpi/ic_billclick_large.png" target-dir="res/drawable-mdpi" />
-		<source-file src="src/android/icon/drawable-xhdpi/ic_billclick_large.png" target-dir="res/drawable-xhdpi" />
-		<source-file src="src/android/icon/drawable-xxhdpi/ic_billclick_large.png" target-dir="res/drawable-xxhdpi" />
+		<resource-file src="src/android/icon/drawable-hdpi/ic_billclick_large.png" target="res/drawable-hdpi/ic_billclick_large.png" />
+		<resource-file src="src/android/icon/drawable-mdpi/ic_billclick_large.png" target="res/drawable-mdpi/ic_billclick_large.png" />
+		<resource-file src="src/android/icon/drawable-xhdpi/ic_billclick_large.png" target="res/drawable-xhdpi/ic_billclick_large.png" />
+		<resource-file src="src/android/icon/drawable-xxhdpi/ic_billclick_large.png" target="res/drawable-xxhdpi/ic_billclick_large.png" />
 		
     </platform>
 

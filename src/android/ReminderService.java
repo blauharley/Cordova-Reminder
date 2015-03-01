@@ -147,17 +147,25 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		else{
 			
 			Notification.Builder builder = new Notification.Builder(this)
-			        .setSmallIcon(getResources().getIdentifier("@drawable/ic_billclick_large", null, getPackageName()))
+			        .setSmallIcon(getResources().getIdentifier("ic_billclick_large", "drawable", getPackageName()))
 			        .setContentTitle(title)
-			        .setContentText(content.replace("#METER", String.valueOf(linearDistance)));
-			
-			Intent resultIntent = new Intent(this, NotifyStarterActivity.class);
+			        .setContentText(content.replace("#METER", String.valueOf(linearDistance)))
+			        .setAutoCancel(true);
 	
-			TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-			stackBuilder.addParentStack(NotifyStarterActivity.class);
-			stackBuilder.addNextIntent(resultIntent);
-			PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);
+			int requestID = (int) System.currentTimeMillis();
+			Intent resultIntent = new Intent(this, NotifyStarterActivity.class);
+			resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP); 
+
+			PendingIntent resultPendingIntent =
+			    PendingIntent.getActivity(
+			    this,
+			    requestID,
+			    resultIntent,
+			    PendingIntent.FLAG_UPDATE_CURRENT
+			);
+			
 			builder.setContentIntent(resultPendingIntent);
+			
 			NotificationManager mNotificationManager =
 			    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 			

@@ -36,13 +36,14 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 			
 			thisAct = this.cordova.getActivity();
 			
-			title = args.getString(0);
-			content = args.getString(1);
-			
-			interval = args.getInt(2);
-			distance = (float)args.getDouble(3);
-			
 			if (ACTION_START.equalsIgnoreCase(action)) {
+				
+				title = args.getString(0);
+				content = args.getString(1);
+				
+				interval = args.getInt(2);
+				distance = (float)args.getDouble(3);
+				
 				callCtx = callbackContext;
 				startReminderService();
 				return true;
