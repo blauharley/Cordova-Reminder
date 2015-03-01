@@ -5,20 +5,25 @@ import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 
-public class ReminderService extends IntentService implements LocationListener, NotificationInterface{
+public class ReminderService extends Service implements LocationListener, NotificationInterface{
 	
 	private final static String name = "ReminderService";
 	private Location startLoc;
@@ -40,13 +45,13 @@ public class ReminderService extends IntentService implements LocationListener, 
 	
 	private boolean locSubscribed = false;
 	
-	public ReminderService() {
-		super(name);
-	}
-	
 	@Override
-	protected void onHandleIntent(Intent intent) {
+	public int onStartCommand(Intent intent, int flags, int startId) {
 		
+		Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+	    Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+	    r.play();
+	    
 		title = intent.getExtras().getString("title");
 		content = intent.getExtras().getString("content");
 		distance = intent.getExtras().getFloat("distance");
@@ -103,6 +108,8 @@ public class ReminderService extends IntentService implements LocationListener, 
 	    setRunning(true);
 	    
 	    triggerService.start();
+	    
+	    return START_REDELIVER_INTENT;
 	    
 	}
 	
@@ -199,6 +206,12 @@ public class ReminderService extends IntentService implements LocationListener, 
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
 		
+	}
+	
+	@Override
+	public IBinder onBind(Intent intent) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	private Integer translateDesiredAccuracy(Integer accuracy) {

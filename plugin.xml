@@ -17,19 +17,18 @@
             </feature>
         </config-file>
 
-        <config-file target="AndroidManifest.xml" parent="/*">
-            <uses-sdk
-                    android:minSdkVersion="16"
-                    android:targetSdkVersion="19" />
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="19" />
 
             <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
             <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
             <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
             <uses-permission android:name="android.permission.ACCESS_COARSE_UPDATES" />
+            <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
-        	<service android:name="ReminderService" android:exported="false"></service>
+        	<service android:name="com.phonegap.reminder.ReminderService" android:enabled="true" android:process=":remote"></service>
         </config-file>
 
         <source-file src="src/android/NotificationInterface.java" target-dir="src/com/phonegap/reminder" />
