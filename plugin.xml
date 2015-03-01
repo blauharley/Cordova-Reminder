@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
+        id="com.phonegap.reminder"
+        version="0.9.0">
+    <name>ReminderPlugin</name>
+
+    <js-module src="www/Reminder.js" name="Reminder">
+        <clobbers target="Reminder"/>
+    </js-module>
+
+    <!-- android -->
+    <platform name="android">
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="Reminder">
+                <param name="android-package" value="com.phonegap.reminder.ReminderLauncher"/>
+            </feature>
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/*">
+            <uses-sdk
+                    android:minSdkVersion="16"
+                    android:targetSdkVersion="19" />
+
+            <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+            <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+            <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+            <uses-permission android:name="android.permission.ACCESS_COARSE_UPDATES" />
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
+        </config-file>
+
+        <source-file src="src/android/NotificationInterface.java" target-dir="src/com/phonegap/reminder" />
+        <source-file src="src/android/NotifyActivity.java" target-dir="src/com/phonegap/reminder" />
+		<source-file src="src/android/ReminderLauncher.java" target-dir="src/com/phonegap/reminder" />
+        <source-file src="src/android/ReminderService.java" target-dir="src/com/phonegap/reminder" />
+		<source-file src="src/android/RunningInterface.java" target-dir="src/com/phonegap/reminder" />
+
+		<source-file src="src/android/icon/drawable-hdpi/ic_billclick_large.png" target-dir="res/drawable/drawable-hdpi" />
+		<source-file src="src/android/icon/drawable-mdpi/ic_billclick_large.png" target-dir="res/drawable/drawable-mdpi" />
+		<source-file src="src/android/icon/drawable-xhdpi/ic_billclick_large.png" target-dir="res/drawable/drawable-xhdpi" />
+		<source-file src="src/android/icon/drawable-xxhdpi/ic_billclick_large.png" target-dir="res/drawable/drawable-xxhdpi" />
+		
+    </platform>
+
+
+</plugin>
