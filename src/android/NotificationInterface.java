@@ -1,4 +1,4 @@
-package com.phonegap.reminder
+package com.phonegap.reminder;
 
 public interface NotificationInterface {
 	public final static int NOTIFICATION_ID = 3061985;
