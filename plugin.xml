@@ -32,7 +32,7 @@
         </config-file>
 
         <source-file src="src/android/NotificationInterface.java" target-dir="src/com/phonegap/reminder" />
-        <source-file src="src/android/NotifyActivity.java" target-dir="src/com/phonegap/reminder" />
+        <source-file src="src/android/NotifyStarterActivity.java" target-dir="src/com/phonegap/reminder" />
 		<source-file src="src/android/ReminderLauncher.java" target-dir="src/com/phonegap/reminder" />
         <source-file src="src/android/ReminderService.java" target-dir="src/com/phonegap/reminder" />
 		<source-file src="src/android/RunningInterface.java" target-dir="src/com/phonegap/reminder" />
