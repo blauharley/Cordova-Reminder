@@ -51,6 +51,7 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 				if(isRunning()){
 					stopReminderService();
 				}
+				callbackContext.success();
 				return true;
 			}
 			else{
@@ -79,6 +80,8 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 			mServiceIntent.putExtra("interval", interval);
 			
 			thisAct.startService(mServiceIntent);
+			
+			callCtx.success();
 			
 		} 
 		else{

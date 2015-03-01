@@ -29,6 +29,7 @@
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
+        	<service android:name="ReminderService" android:exported="false"></service>
         </config-file>
 
         <source-file src="src/android/NotificationInterface.java" target-dir="src/com/phonegap/reminder" />
