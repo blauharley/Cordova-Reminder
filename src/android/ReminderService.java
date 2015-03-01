@@ -17,7 +17,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
-import android.support.v4.app.NotificationCompat;
 
 public class ReminderService extends IntentService implements LocationListener, NotificationInterface{
 	
@@ -140,9 +139,8 @@ public class ReminderService extends IntentService implements LocationListener, 
 		}
 		else{
 			
-			NotificationCompat.Builder mBuilder =
-			        new NotificationCompat.Builder(this)
-			        .setSmallIcon(R.drawable.ic_billclick_large)
+			Notification.Builder builder = new Notification.Builder(this)
+			        .setSmallIcon(android.R.drawable.ic_billclick_large)
 			        .setContentTitle(title)
 			        .setContentText(content.replace("#METER", String.valueOf(linearDistance)));
 			
@@ -152,11 +150,11 @@ public class ReminderService extends IntentService implements LocationListener, 
 			stackBuilder.addParentStack(NotifyStarterActivity.class);
 			stackBuilder.addNextIntent(resultIntent);
 			PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);
-			mBuilder.setContentIntent(resultPendingIntent);
+			builder.setContentIntent(resultPendingIntent);
 			NotificationManager mNotificationManager =
 			    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 			
-			Notification note = mBuilder.build();
+			Notification note = builder.build();
 			note.flags = Notification.DEFAULT_LIGHTS | Notification.FLAG_AUTO_CANCEL;
 			
 			mNotificationManager.notify(NOTIFICATION_ID, note);

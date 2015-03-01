@@ -17,7 +17,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-public class ReminderLauncher extends Activity implements NotificationInterface, RunningInterface{
+public class ReminderLauncher extends CordovaPlugin implements NotificationInterface, RunningInterface{
 
 	public static final String ACTION_START = "start";
 	public static final String ACTION_CLEAR = "clear";
