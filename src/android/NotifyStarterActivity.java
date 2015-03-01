@@ -1,4 +1,4 @@
-package com.example.anotherlauncherapp;
+package com.phonegap.reminder;
 
 import android.app.Activity;
 import android.content.Intent;

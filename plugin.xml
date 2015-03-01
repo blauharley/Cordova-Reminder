@@ -37,10 +37,10 @@
         <source-file src="src/android/ReminderService.java" target-dir="src/com/phonegap/reminder" />
 		<source-file src="src/android/RunningInterface.java" target-dir="src/com/phonegap/reminder" />
 
-		<source-file src="src/android/icon/drawable-hdpi/ic_billclick_large.png" target-dir="res/drawable/drawable-hdpi" />
-		<source-file src="src/android/icon/drawable-mdpi/ic_billclick_large.png" target-dir="res/drawable/drawable-mdpi" />
-		<source-file src="src/android/icon/drawable-xhdpi/ic_billclick_large.png" target-dir="res/drawable/drawable-xhdpi" />
-		<source-file src="src/android/icon/drawable-xxhdpi/ic_billclick_large.png" target-dir="res/drawable/drawable-xxhdpi" />
+		<source-file src="src/android/icon/drawable-hdpi/ic_billclick_large.png" target-dir="res/drawable-hdpi" />
+		<source-file src="src/android/icon/drawable-mdpi/ic_billclick_large.png" target-dir="res/drawable-mdpi" />
+		<source-file src="src/android/icon/drawable-xhdpi/ic_billclick_large.png" target-dir="res/drawable-xhdpi" />
+		<source-file src="src/android/icon/drawable-xxhdpi/ic_billclick_large.png" target-dir="res/drawable-xxhdpi" />
 		
     </platform>
 

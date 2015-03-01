@@ -140,7 +140,7 @@ public class ReminderService extends IntentService implements LocationListener, 
 		else{
 			
 			Notification.Builder builder = new Notification.Builder(this)
-			        .setSmallIcon(android.R.drawable.ic_billclick_large)
+			        .setSmallIcon(getResources().getIdentifier("@drawable/ic_billclick_large", null, getPackageName()))
 			        .setContentTitle(title)
 			        .setContentText(content.replace("#METER", String.valueOf(linearDistance)));
 			

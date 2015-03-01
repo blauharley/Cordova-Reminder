@@ -32,26 +32,37 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 	
 	public boolean execute(String action, JSONArray args, CallbackContext callbackContext) {
 		
-		thisAct = this.cordova.getActivity();
-		
-		title = args.getString(0);
-		content = args.getString(1);
-		
-		interval = args.getInt(2);
-		distance = args.getDouble(3);
-		
-		if (ACTION_START.equalsIgnoreCase(action)) {
-			callCtx = callbackContext;
-			startReminderService();
-		}
-		else if(ACTION_CLEAR.equalsIgnoreCase(action)){
-			if(isRunning()){
-				stopReminderService();
+		try {
+			
+			thisAct = this.cordova.getActivity();
+			
+			title = args.getString(0);
+			content = args.getString(1);
+			
+			interval = args.getInt(2);
+			distance = args.getDouble(3);
+			
+			if (ACTION_START.equalsIgnoreCase(action)) {
+				callCtx = callbackContext;
+				startReminderService();
+				return true;
 			}
+			else if(ACTION_CLEAR.equalsIgnoreCase(action)){
+				if(isRunning()){
+					stopReminderService();
+				}
+				return true;
+			}
+			else{
+				callbackContext.error("Call undefined action: "+action);
+				return false;
+			}
+		
+		} catch (JSONException e) {
+			callbackContext.error("Reminder exception occured: "+e.toString());
+			return false;
 		}
-		else{
-			callbackContext.error("Call undefined action: "+action);
-		}
+		
 		
 	}
 
@@ -61,7 +72,7 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 		
 		if (currentapiVersion >= Build.VERSION_CODES.FROYO){
 		    
-			Intent mServiceIntent = new Intent(this, ReminderService.class);
+			Intent mServiceIntent = new Intent(thisAct.getApplicationContext(), ReminderService.class);
 			mServiceIntent.putExtra("title", title);
 			mServiceIntent.putExtra("content", content);
 			mServiceIntent.putExtra("distance", distance);
@@ -79,17 +90,17 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 	private void stopReminderService(){
 		setRunning(false);
 		NotificationManager mNotificationManager =
-			    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+			    (NotificationManager) thisAct.getSystemService(Context.NOTIFICATION_SERVICE);
 		mNotificationManager.cancel(NOTIFICATION_ID);
 	}
 	
 	public boolean isRunning() {
-	    SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+	    SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(thisAct.getApplicationContext());
 	    return pref.getBoolean(SERVICE_IS_RUNNING, false);
 	}
 	
 	public void setRunning(boolean running) {
-	    SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+	    SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(thisAct.getApplicationContext());
 	    SharedPreferences.Editor editor = pref.edit();
 
 	    editor.putBoolean(SERVICE_IS_RUNNING, running);
