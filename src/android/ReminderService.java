@@ -10,6 +10,7 @@ import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -34,7 +35,8 @@ public class ReminderService extends Service implements LocationListener, Notifi
 	private String content;
 	private float distance;
 	private long interval;
-	
+	private boolean whistle;
+		
 	private float radiusDistance;
 	private float linearDistance;
 	private Integer desiredAccuracy = 100;
@@ -48,14 +50,11 @@ public class ReminderService extends Service implements LocationListener, Notifi
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		
-		Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-	    Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
-	    r.play();
-	    
 		title = intent.getExtras().getString("title");
 		content = intent.getExtras().getString("content");
 		distance = intent.getExtras().getFloat("distance");
 		interval = intent.getExtras().getLong("interval");
+		whistle = intent.getExtras().getBoolean("whistle");
 		
 		radiusDistance = 0;
 		linearDistance = 0;
@@ -142,6 +141,12 @@ public class ReminderService extends Service implements LocationListener, Notifi
 	    editor.apply();
 	}
 	
+	private void makeWhistle(){
+		Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+	    Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+	    r.play();
+	}
+	
 	private boolean timeOut(){
 		return System.currentTimeMillis() >= (currentMsTime + interval);
 	}
@@ -175,7 +180,10 @@ public class ReminderService extends Service implements LocationListener, Notifi
 			        .setAutoCancel(true);
 	
 			int requestID = (int) System.currentTimeMillis();
-			Intent resultIntent = new Intent(this, NotifyStarterActivity.class);
+			
+			PackageManager pm = getPackageManager();
+			Intent resultIntent = pm.getLaunchIntentForPackage(getApplicationContext().getPackageName());
+			
 			resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP); 
 
 			PendingIntent resultPendingIntent =
@@ -195,6 +203,10 @@ public class ReminderService extends Service implements LocationListener, Notifi
 			note.flags = Notification.DEFAULT_LIGHTS | Notification.FLAG_AUTO_CANCEL;
 			
 			mNotificationManager.notify(NOTIFICATION_ID, note);
+			
+			if(whistle){
+				makeWhistle();
+			}
 			
 		}
 		

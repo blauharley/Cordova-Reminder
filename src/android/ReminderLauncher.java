@@ -26,6 +26,8 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 	private String content;
 	private float distance;
 	private long interval;
+	private boolean whistle;
+	private boolean closeApp;
 	
 	private Activity thisAct;
 	private CallbackContext callCtx;
@@ -44,14 +46,15 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 				interval = args.getInt(2);
 				distance = (float)args.getDouble(3);
 				
+				whistle = args.getBoolean(4);
+				closeApp = args.getBoolean(5);
+				
 				callCtx = callbackContext;
 				startReminderService();
 				return true;
 			}
 			else if(ACTION_CLEAR.equalsIgnoreCase(action)){
-				if(isRunning()){
-					stopReminderService();
-				}
+				stopReminderService();
 				callbackContext.success();
 				return true;
 			}
@@ -81,8 +84,15 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 			mServiceIntent.putExtra("content", content);
 			mServiceIntent.putExtra("distance", distance);
 			mServiceIntent.putExtra("interval", interval);
+			mServiceIntent.putExtra("whistle", whistle);
+			mServiceIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 			
 			thisAct.startService(mServiceIntent);
+			
+			// be careful when using it last service might not be stopped
+			if(closeApp){
+				thisAct.finish();
+			}
 			
 		} 
 		else{

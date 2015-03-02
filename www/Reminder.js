@@ -39,8 +39,10 @@ module.exports = {
         var content = options.content ? options.content : "Reminder-Content";
         var interval = options.interval ? options.interval : 60000;
         var distance = options.distance ? options.distance : 100;
+        var whistle = options.whistle != undefined ? options.whistle : true;
+        var closeApp = options.closeApp != undefined ? options.closeApp : true;
 
-        var args = [title, content,interval, distance];
+        var args = [title,content,interval,distance,whistle,closeApp];
         console.log(args);
 
         exec(successCallback, errorCallback, "Reminder", "start", args);
