@@ -113,6 +113,22 @@ public class ReminderService extends Service implements LocationListener, Notifi
 	    
 	}
 	
+	@Override
+	public boolean stopService(Intent intent) {
+		
+		cleanUp();
+		
+		return super.stopService(intent);
+
+	}
+
+	@Override
+	public void onDestroy() {
+	
+		cleanUp();
+		
+	}
+	
 	public boolean isRunning() {
 	    SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 	    return pref.getBoolean(SERVICE_IS_RUNNING, false);
@@ -130,18 +146,24 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		return System.currentTimeMillis() >= (currentMsTime + interval);
 	}
 	
+	private void cleanUp() {
+		
+		locationManager.removeUpdates(this);
+	
+		if(mUserLocationHandler != null){
+			mUserLocationHandler.getLooper().quit();
+		}
+		
+		triggerService.interrupt();
+		
+	}
+	
 	@TargetApi(16)
 	private void showNotification(){
 		
 		if(!isRunning()){
 			
-    		locationManager.removeUpdates(this);
-	
-    		if(mUserLocationHandler != null){
-    			mUserLocationHandler.getLooper().quit();
-    		}
-    		
-    		triggerService.interrupt();
+    		cleanUp();
     		
 		}
 		else{

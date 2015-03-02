@@ -93,6 +93,8 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 	
 	private void stopReminderService(){
 		setRunning(false);
+		Intent mServiceIntent = new Intent(thisAct, ReminderService.class);
+		thisAct.stopService(mServiceIntent);
 		NotificationManager mNotificationManager =
 			    (NotificationManager) thisAct.getSystemService(Context.NOTIFICATION_SERVICE);
 		mNotificationManager.cancel(NOTIFICATION_ID);
