@@ -1,4 +1,4 @@
-This Cordova-Plugin enables users to get notified by push-notifications when they reach a certain distance and time-interval.
+This Cordova-Plugin enables users to get notified by Push-Notifications when they reach a certain <b>distance</b> and time-<b>interval</b>.
 
 <h3>Examples:</h3>
 
