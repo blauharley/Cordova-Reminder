@@ -40,7 +40,7 @@ This Cordova-Plugin enables users to get notified by push-notifications when the
        content: String,
        interval: Number
        distance: Number,
-   whistle: Boolean,
+       whistle: Boolean,
        closeApp: Boolean
     }
  );
