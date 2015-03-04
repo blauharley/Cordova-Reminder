@@ -1,4 +1,4 @@
-This Cordova-Plugin enables users to get notified by Push-Notifications when they reach a certain <b>distance</b> and time-<b>interval</b>.
+This Cordova-Plugin enables users to get notified by Reminder-Notifications when they reach a certain <b>distance</b> and time-<b>interval</b>. Therefore showing Reminder-Notifications bases on how far user have gone in meters and whether a certain time has gone.
 
 <h3>Examples:</h3>
 
@@ -76,7 +76,7 @@ This Cordova-Plugin enables users to get notified by Push-Notifications when the
 <h3>Supported Platforms:</h3>
 
 <ul>
-	<li>Android</li>
+	<li>Android(Jelly Bean, Version: >= 4.1, API: >= 16)</li>
 </ul>
 
 <h3>License:</h3>
