@@ -1,7 +1,5 @@
 This Cordova-Plugin enables users to get notified by Reminder-Notifications when they reach a certain <b>distance</b> and time-<b>interval</b>. Therefore showing Reminder-Notifications bases on how far user have gone in meters and whether a certain time has gone.
 
-<h3>Examples:</h3>
-
 <h3>Start a Reminder-Notification</h3>
 
 <blockquote>
@@ -13,14 +11,14 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications when
   <p>
 	@param <b><i>options</i></b> must be an Object to be given to adjust some Preferences:
 	<ul>
-	  <li><b><i>title</i></b> must be a String to be shown as title within Reminder-Notification, <b>default: "Reminder-Notification"</b></li>
-	  <li><b><i>content</i></b> must be a String to be shown as content-text within Reminder-Notification. Within content there can be a #METER-Notation that is replaced by the actual meters for instance "You went #METER meters!" is shown within a Reminder-Notification where #METER is a Number. <b>default: "Reminder-Content"</b></li>
-	  <li><b><i>interval</i></b> must be a Number in Milliseconds to be gone to show a Reminder-Notification, <b>default: 60000</b></li>
-	  <li><b><i>distance</i></b> must be a Number in Meter to be reached to show a Reminder-Notification, <b>default: 100</b></li>
-	  <li><b><i>whistle</i></b> must be a Boolean to enable/disable Whistle-Sound, <b>default: true</b></li>
-	  <li><b><i>closeApp</i></b> must be a Boolean to-close/not-to-close App, <b>default: true</b></li>
-	  <li><b><i>stopDate</i></b> must be a String to indicate Reminder should run forever or being stopped next Day, ("forever" | "tomorrow") <b>default: "forever"</b></li>
-      <li><b><i>distanceTolerance</i></b> must be a Number to omit possibly fluctuations, by default all little distance-alterations are taken into consideration. <b>default: 0</b></li>
+	  <li><b><i>title</i></b> must be a String to be shown as title within Reminder-Notification, </br><b>default: "Reminder-Notification"</b></li>
+	  <li><b><i>content</i></b> must be a String to be shown as content-text within Reminder-Notification. Within content there can be a #METER-Notation that is replaced by the actual meters for instance "You went #METER meters!" is shown within a Reminder-Notification where #METER is a Number.</br> <b>default: "Reminder-Content"</b></li>
+	  <li><b><i>interval</i></b> must be a Number in Milliseconds to be gone to show a Reminder-Notification, </br><b>default: 60000</b></li>
+	  <li><b><i>distance</i></b> must be a Number in Meter to be reached to show a Reminder-Notification, </br><b>default: 100</b></li>
+	  <li><b><i>whistle</i></b> must be a Boolean to enable/disable Whistle-Sound, </br><b>default: true</b></li>
+	  <li><b><i>closeApp</i></b> must be a Boolean to-close/not-to-close App, </br><b>default: true</b></li>
+	  <li><b><i>stopDate</i></b> must be a String to indicate Reminder should run forever or being stopped next Day, ("forever" | "tomorrow") </br><b>default: "forever"</b></li>
+      <li><b><i>distanceTolerance</i></b> must be a Number to omit possibly fluctuations, by default all little distance-alterations are taken into consideration. </br><b>default: 0</b></li>
 	</ul>
   </p>
 
@@ -35,7 +33,7 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications when
        console.log("Reminder started")
     },
     function(e){
-       console.log("Reminder error",e);
+       console.log("Reminder started error",e);
     },
     {
        title: String,
@@ -69,7 +67,7 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications when
        console.log("Reminder cleared")
     },
     function(e){
-       console.log("Reminder clear error",e);
+       console.log("Reminder cleared error",e);
     }
  );
 
@@ -80,7 +78,7 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications when
   <p><b>Reminder.isRunning( out success:Function, out error:Function ) : undefined</b></p>
 
   <p>@param <b><i>success</i></b> must be a Function to be called when all went right and a result is returned as <i>Object</i>-parameter to check whether Reminder is running.</p>
-  <p>@param <b><i>error</i></b> must be a Function to be called when there has been an error and/or a Remind-Notification could not be set.</p>
+  <p>@param <b><i>error</i></b> must be a Function to be called when there has been an error.</p>
 
   <p>@return undefined</p>
 	
