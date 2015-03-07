@@ -36,12 +36,13 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications when
        console.log("Reminder started error",e);
     },
     {
-       title: String,
-       content: String,
-       interval: Number
-       distance: Number,
-       whistle: Boolean,
-       closeApp: Boolean
+       title: "This is a title",
+       content: "You have gone #METER meters",
+       interval: 60000,
+       distance: 100,
+       whistle: false,
+       closeApp: false,
+       stopDate: "tomorrow"
     }
  );
 
