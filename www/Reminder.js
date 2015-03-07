@@ -23,14 +23,24 @@ var exec = require("cordova/exec");
 module.exports = {
 
     /*
-        start actual reminder
-        defaults:{
+    @info
+        start reminder
+
+        @params
+
+        successCallback: Function
+        errorCallback: Function
+        options:{
             title : "Reminder-Notification"
             content: "Reminder-Content"
-            interval: 60000 milliseconds
-            distance: 100 meters
+            interval: 60000 (in milliseconds)
+            distance: 100 (in meters)
+            whistle: true
+            closeApp: true
+            stopDate: "forever" ("forever" | "tomorrow")
+            distanceTolerance: 0
         }
-     */
+    */
     start : function (successCallback, errorCallback, options) {
 
         options = options || {};
@@ -41,16 +51,38 @@ module.exports = {
         var distance = options.distance ? options.distance : 100;
         var whistle = options.whistle != undefined ? options.whistle : true;
         var closeApp = options.closeApp != undefined ? options.closeApp : true;
+        var stopDate = options.stopDate != undefined ? options.stopDate : "forever";
+        var distanceTolerance = options.distanceTolerance != undefined ? options.distanceTolerance : 0;
 
-        var args = [title,content,interval,distance,whistle,closeApp];
-        console.log(args);
+        var args = [title,content,interval,distance,whistle,closeApp,stopDate,distanceTolerance];
 
         exec(successCallback, errorCallback, "Reminder", "start", args);
-
     },
 
+    /*
+     @info
+         stop reminder
+
+         @params
+
+         successCallback: Function
+         errorCallback: Function
+    */
     clear : function (successCallback, errorCallback) {
         exec(successCallback, errorCallback, "Reminder", "clear", []);
+    },
+
+    /*
+     @info
+         check reminder runs
+
+         @params
+
+         successCallback: Function
+         errorCallback: Function
+     */
+    isRunning : function (successCallback, errorCallback) {
+        exec(successCallback, errorCallback, "Reminder", "isrunning", []);
     }
 
 };

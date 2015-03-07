@@ -24,6 +24,8 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 
+import java.util.Calendar;
+
 public class ReminderService extends Service implements LocationListener, NotificationInterface{
 	
 	private final static String name = "ReminderService";
@@ -36,12 +38,15 @@ public class ReminderService extends Service implements LocationListener, Notifi
 	private float distance;
 	private long interval;
 	private boolean whistle;
-		
+	private String stopDate;
+	private float distanceTolerance;
+	
 	private float radiusDistance;
 	private float linearDistance;
 	private Integer desiredAccuracy = 100;
 	private long currentMsTime;
-
+	private int stopServiceDate = -1;
+	
 	private Handler mUserLocationHandler = null;
 	private Thread triggerService = null;
 	
@@ -55,6 +60,13 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		distance = intent.getExtras().getFloat("distance");
 		interval = intent.getExtras().getLong("interval");
 		whistle = intent.getExtras().getBoolean("whistle");
+		stopDate = intent.getExtras().getString("stopDate");
+		distanceTolerance = intent.getExtras().getFloat("distanceTolerance");
+		
+		if(STOP_SERVICE_DATE_TOMORROW.equalsIgnoreCase(stopDate)){
+			Calendar calendar = Calendar.getInstance();
+			stopServiceDate = calendar.get(Calendar.DAY_OF_WEEK);
+		}
 		
 		radiusDistance = 0;
 		linearDistance = 0;
@@ -151,7 +163,19 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		return System.currentTimeMillis() >= (currentMsTime + interval);
 	}
 	
+	private boolean handleServiceStop(){
+		Calendar calendar = Calendar.getInstance();
+		int currDay = calendar.get(Calendar.DAY_OF_WEEK);
+		return stopServiceDate != -1 && stopServiceDate != currDay;	
+	}
+	
 	private void cleanUp() {
+		
+		PackageManager pm = getPackageManager();
+		Intent callingIntent = pm.getLaunchIntentForPackage(getApplicationContext().getPackageName());
+		
+		NotificationManager mNotificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+		mNotificationManager.cancel(NOTIFICATION_ID);
 		
 		locationManager.removeUpdates(this);
 	
@@ -215,13 +239,24 @@ public class ReminderService extends Service implements LocationListener, Notifi
 	@Override
 	public void onLocationChanged(Location location) {
 		
+		if(handleServiceStop()){
+			stopSelf();
+			return;
+		}
+		
+		float distanceStep = lastloc.distanceTo(location);
+		
+		if(distanceStep < distanceTolerance){
+			return;
+		}
+		
 		if(startLoc.getLatitude() == 0 && startLoc.getLongitude() == 0){
 			linearDistance = 0;
 			startLoc.set(location);
 			lastloc.set(location);
 		}
 		else{
-			linearDistance += lastloc.distanceTo(location);
+			linearDistance += distanceStep;
 			radiusDistance = startLoc.distanceTo(location);
 			lastloc.set(location);
 		}

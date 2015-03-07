@@ -4,6 +4,7 @@ import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.NotificationManager;
@@ -21,6 +22,7 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 
 	public static final String ACTION_START = "start";
 	public static final String ACTION_CLEAR = "clear";
+	public static final String ACTION_IS_RUNNING = "isrunning";
 	
 	private String title;
 	private String content;
@@ -28,6 +30,8 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 	private long interval;
 	private boolean whistle;
 	private boolean closeApp;
+	private String stopDate;
+	private float distanceTolerance;
 	
 	private Activity thisAct;
 	private CallbackContext callCtx;
@@ -49,6 +53,10 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 				whistle = args.getBoolean(4);
 				closeApp = args.getBoolean(5);
 				
+				stopDate = args.getString(6);
+				
+				distanceTolerance = (float)args.getDouble(7);
+				
 				callCtx = callbackContext;
 				startReminderService();
 				return true;
@@ -56,6 +64,12 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 			else if(ACTION_CLEAR.equalsIgnoreCase(action)){
 				stopReminderService();
 				callbackContext.success();
+				return true;
+			}
+			else if(ACTION_IS_RUNNING.equalsIgnoreCase(action)){
+				JSONObject jsonObj = new JSONObject();
+				jsonObj.put("isRunning",isRunning());
+				callbackContext.success(jsonObj);
 				return true;
 			}
 			else{
@@ -85,11 +99,14 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 			mServiceIntent.putExtra("distance", distance);
 			mServiceIntent.putExtra("interval", interval);
 			mServiceIntent.putExtra("whistle", whistle);
+			mServiceIntent.putExtra("stopDate", stopDate);
+			mServiceIntent.putExtra("distanceTolerance", distanceTolerance);
 			mServiceIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 			
 			thisAct.startService(mServiceIntent);
 			
-			// be careful when using it last service might not be stopped
+			setRunning(true);
+			
 			if(closeApp){
 				thisAct.finish();
 			}
@@ -105,14 +122,11 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 		setRunning(false);
 		Intent mServiceIntent = new Intent(thisAct, ReminderService.class);
 		thisAct.stopService(mServiceIntent);
-		NotificationManager mNotificationManager =
-			    (NotificationManager) thisAct.getSystemService(Context.NOTIFICATION_SERVICE);
-		mNotificationManager.cancel(NOTIFICATION_ID);
 	}
 	
 	public boolean isRunning() {
 	    SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(thisAct.getApplicationContext());
-	    return pref.getBoolean(SERVICE_IS_RUNNING, false);
+	    return pref.contains(SERVICE_IS_RUNNING) && pref.getBoolean(SERVICE_IS_RUNNING, false);
 	}
 	
 	public void setRunning(boolean running) {

@@ -6,31 +6,33 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications when
 
 <blockquote>
 
-  <p>@param <i>success</i> must be a Function to be called when all went right and/or a new Remind-Notification is set.</p>
-  <p>@param <i>error</i> must be a Function to be called when there was an error and/or a Remind-Notification could not be set.</p>
+  <p><b>Reminder.start( out success:Function, out error:Function, in options:Object ) : undefined</b></p>
+
+  <p>@param <b><i>success</i></b> must be a Function to be called when all went right and/or a new Remind-Notification is set.</p>
+  <p>@param <b><i>error</i></b> must be a Function to be called when there has been an error and/or a Remind-Notification could not be set.</p>
   <p>
-	@param <i>options</i> must be an Object to be given to adjust some Preferences:
+	@param <b><i>options</i></b> must be an Object to be given to adjust some Preferences:
 	<ul>
-	  <li><i>title</i>must be a String to be shown as title within Reminder-Notification, default: "Reminder-Notification"</li>
-	  <li><i>content</i>must be a String to be shown as content-text within Reminder-Notification. Within content there can be a #METER-Notation that is replaced by the actual meters for instance "You went #METER meters!" is shown within a Reminder-Notification where #METER is a Number. default: "Reminder-Content"</li>
-	  <li><i>interval</i>must be a Number in Milliseconds to be gone to show a Reminder-Notification, default: 60000</li>
-	  <li><i>distance</i>must be a Number in Meter to be reached to show a Reminder-Notification, default: 100</li>
-	  <li><i>whistle</i>must be a Boolean to enable/disable Whistle-Sound, default: true</li>
-	  <li><i>closeApp</i>must be a Boolean to-close/not-to-close App, default: true</li>
+	  <li><b><i>title</i></b> must be a String to be shown as title within Reminder-Notification, <b>default: "Reminder-Notification"</b></li>
+	  <li><b><i>content</i></b> must be a String to be shown as content-text within Reminder-Notification. Within content there can be a #METER-Notation that is replaced by the actual meters for instance "You went #METER meters!" is shown within a Reminder-Notification where #METER is a Number. <b>default: "Reminder-Content"</b></li>
+	  <li><b><i>interval</i></b> must be a Number in Milliseconds to be gone to show a Reminder-Notification, <b>default: 60000</b></li>
+	  <li><b><i>distance</i></b> must be a Number in Meter to be reached to show a Reminder-Notification, <b>default: 100</b></li>
+	  <li><b><i>whistle</i></b> must be a Boolean to enable/disable Whistle-Sound, <b>default: true</b></li>
+	  <li><b><i>closeApp</i></b> must be a Boolean to-close/not-to-close App, <b>default: true</b></li>
+	  <li><b><i>stopDate</i></b> must be a String to indicate Reminder should run forever or being stopped next Day, ("forever" | "tomorrow") <b>default: "forever"</b></li>
+      <li><b><i>distanceTolerance</i></b> must be a Number to omit possibly fluctuations, by default all little distance-alterations are taken into consideration. <b>default: 0</b></li>
 	</ul>
   </p>
 
   <p>@return undefined</p>
 	
-  <p><b>Reminder.start( out success:Function, out error:Function, in options:Object ) : undefined</b></p>
-
 </blockquote>
 
 ```javascript
 
  Reminder.start(
     function(){
-       console.log("Reminder success")
+       console.log("Reminder started")
     },
     function(e){
        console.log("Reminder error",e);
@@ -51,25 +53,47 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications when
 
 <blockquote>
 
-  <p>@param <i>success</i> must be a Function to be called when all went right and/or a new Remind-Notification is set.</p>
-  <p>@param <i>error</i> must be a Function to be called when there was an error and/or a Remind-Notification could not be set.</p>
+  <p><b>Reminder.clear( out success:Function, out error:Function ) : undefined</b></p>
+
+  <p>@param <b><i>success</i></b> must be a Function to be called when all went right and/or a new Remind-Notification is cleared.</p>
+  <p>@param <b><i>error</i></b> must be a Function to be called when there has been an error and/or a Remind-Notification could not be cleared.</p>
 
   <p>@return undefined</p>
 	
-  <p><b>Reminder.clear( out success:Function, out error:Function ) : undefined</b></p>
-
 </blockquote>
 
 ```javascript
 
  Reminder.clear(
     function(){
-       console.log("Reminder clear success")
+       console.log("Reminder cleared")
     },
     function(e){
        console.log("Reminder clear error",e);
     }
  );
+
+```
+
+<blockquote>
+
+  <p><b>Reminder.isRunning( out success:Function, out error:Function ) : undefined</b></p>
+
+  <p>@param <b><i>success</i></b> must be a Function to be called when all went right and a result is returned as <i>Object</i>-parameter to check whether Reminder is running.</p>
+  <p>@param <b><i>error</i></b> must be a Function to be called when there has been an error and/or a Remind-Notification could not be set.</p>
+
+  <p>@return undefined</p>
+	
+</blockquote>
+
+```javascript
+
+ Reminder.isRunning(function(result){
+      console.log("Reminder isRunning",result.isRunning);
+ },
+ function(e){
+      console.log("Reminder isRunning error",e);
+ });
 
 ```
 
