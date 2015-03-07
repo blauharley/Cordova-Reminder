@@ -74,6 +74,8 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications when
 
 ```
 
+<h3>Check for Reminder is running</h3>
+
 <blockquote>
 
   <p><b>Reminder.isRunning( out success:Function, out error:Function ) : undefined</b></p>
