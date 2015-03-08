@@ -200,7 +200,7 @@ public class ReminderService extends Service implements LocationListener, Notifi
 			Notification.Builder builder = new Notification.Builder(this)
 			        .setSmallIcon(getResources().getIdentifier("ic_billclick_large", "drawable", getPackageName()))
 			        .setContentTitle(title)
-			        .setContentText(content.replace("#METER", String.valueOf(linearDistance)))
+			        .setContentText(content.replace("#ML", String.valueOf(linearDistance)).replace("#MR", String.valueOf(radiusDistance)))
 			        .setAutoCancel(true);
 	
 			int requestID = (int) System.currentTimeMillis();

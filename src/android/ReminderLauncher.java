@@ -7,6 +7,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
@@ -119,22 +121,20 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 	}
 	
 	private void stopReminderService(){
-		setRunning(false);
 		Intent mServiceIntent = new Intent(thisAct, ReminderService.class);
 		thisAct.stopService(mServiceIntent);
 	}
 	
 	public boolean isRunning() {
-	    SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(thisAct.getApplicationContext());
-	    return pref.contains(SERVICE_IS_RUNNING) && pref.getBoolean(SERVICE_IS_RUNNING, false);
+		ActivityManager manager = (ActivityManager) thisAct.getSystemService(thisAct.ACTIVITY_SERVICE);
+	    for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+	        if (ReminderService.class.getName().equals(service.service.getClassName())) {
+	            return true;
+	        }
+	    }
+	    return false;
 	}
 	
-	public void setRunning(boolean running) {
-	    SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(thisAct.getApplicationContext());
-	    SharedPreferences.Editor editor = pref.edit();
-
-	    editor.putBoolean(SERVICE_IS_RUNNING, running);
-	    editor.apply();
-	}
+	public void setRunning(boolean running) {}
 	
 }

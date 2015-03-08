@@ -38,7 +38,7 @@ module.exports = {
             whistle: true
             closeApp: true
             stopDate: "forever" ("forever" | "tomorrow")
-            distanceTolerance: 0
+            distanceTolerance: 10 (in meters)
         }
     */
     start : function (successCallback, errorCallback, options) {
@@ -52,7 +52,7 @@ module.exports = {
         var whistle = options.whistle != undefined ? options.whistle : true;
         var closeApp = options.closeApp != undefined ? options.closeApp : true;
         var stopDate = options.stopDate != undefined ? options.stopDate : "forever";
-        var distanceTolerance = options.distanceTolerance != undefined ? options.distanceTolerance : 0;
+        var distanceTolerance = options.distanceTolerance != undefined ? options.distanceTolerance : 10;
 
         var args = [title,content,interval,distance,whistle,closeApp,stopDate,distanceTolerance];
 

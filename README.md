@@ -1,4 +1,4 @@
-This Cordova-Plugin enables users to get notified by Reminder-Notifications when they reach a certain <b>distance</b> and time-<b>interval</b>. Therefore showing Reminder-Notifications bases on how far user have gone in meters and whether a certain time has gone.
+This Cordova-Plugin enables users to get notified by Reminder-Notifications when they reach a certain <b>linear-distance</b> and time-<b>interval</b>. Therefore showing Reminder-Notifications bases on how far user have gone in meters and whether a certain time has gone.
 
 <h3>Start a Reminder-Notification</h3>
 
@@ -12,13 +12,13 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications when
 	@param <b><i>options</i></b> must be an Object to be given to adjust some Preferences:
 	<ul>
 	  <li><b><i>title</i></b> must be a String to be shown as title within Reminder-Notification, </br><b>default: "Reminder-Notification"</b></li>
-	  <li><b><i>content</i></b> must be a String to be shown as content-text within Reminder-Notification. Within content there can be a #METER-Notation that is replaced by the actual meters for instance "You went #METER meters!" is shown within a Reminder-Notification where #METER is a Number.</br> <b>default: "Reminder-Content"</b></li>
-	  <li><b><i>interval</i></b> must be a Number in Milliseconds to be gone to show a Reminder-Notification, </br><b>default: 60000</b></li>
+	  <li><b><i>content</i></b> must be a String to be shown as content-text within a Reminder-Notification. Within content there can be a #ML-Notation(linear-distance) that is replaced by the actual gone meters and #MR(radius-distance) for instance "You went #ML meters! within a radius of #MR" is shown within a Reminder-Notification where #ML/#MR are Numbers representing linear/radius-distance.</br> <b>default: "Reminder-Content"</b></li>
+	  <li><b><i>interval</i></b> must be a Number in Milliseconds to be gone to show a Reminder-Notification, </br><b>default: 60000(1 minute)</b></li>
 	  <li><b><i>distance</i></b> must be a Number in Meter to be reached to show a Reminder-Notification, </br><b>default: 100</b></li>
 	  <li><b><i>whistle</i></b> must be a Boolean to enable/disable Whistle-Sound, </br><b>default: true</b></li>
 	  <li><b><i>closeApp</i></b> must be a Boolean to-close/not-to-close App, </br><b>default: true</b></li>
 	  <li><b><i>stopDate</i></b> must be a String to indicate Reminder should run forever or being stopped next Day, ("forever" | "tomorrow") </br><b>default: "forever"</b></li>
-      <li><b><i>distanceTolerance</i></b> must be a Number to omit possibly fluctuations, by default all little distance-alterations are taken into consideration. </br><b>default: 0</b></li>
+      <li><b><i>distanceTolerance</i></b> must be a Number to omit possibly fluctuations, by default all little distance-alterations are taken into consideration. </br><b>default: 10</b></li>
 	</ul>
   </p>
 
@@ -37,7 +37,7 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications when
     },
     {
        title: "This is a title",
-       content: "You have gone #METER meters",
+       content: "You have gone #ML meters within a #MR radius",
        interval: 60000,
        distance: 100,
        whistle: false,
@@ -47,6 +47,9 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications when
  );
 
 ```
+
+<p>A Reminder-Notification is shown when adjusted <b><i>distance</i></b>(linear-distance) and <b><i>interval</i></b> is reached.</p>
+
 
 <h3>Clear/Cancel a Remind-Notification</h3>
 
@@ -73,6 +76,7 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications when
  );
 
 ```
+
 
 <h3>Check for Reminder is running</h3>
 
@@ -101,7 +105,7 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications when
 <h3>Supported Platforms:</h3>
 
 <ul>
-	<li>Android(Jelly Bean, Version: >= 4.1, API: >= 16)</li>
+  <li>Android(Jelly Bean, Version: >= 4.1, API: >= 16)</li>
 </ul>
 
 <h3>License:</h3>
