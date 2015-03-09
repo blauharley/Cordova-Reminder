@@ -2,8 +2,11 @@
 
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
         id="com.phonegap.reminder"
-        version="0.9.0">
+        version="0.9.3">
     <name>ReminderPlugin</name>
+    <description>this plugin enables users to be reminded by push-notifications when they have reached a certain distance and time-interval.</description>
+    <license>GNU</license>
+    <keywords>cordova,push-notification,distance,time-interval,android</keywords>
 
     <js-module src="www/Reminder.js" name="Reminder">
         <clobbers target="Reminder"/>
@@ -34,14 +37,14 @@
         <source-file src="src/android/NotificationInterface.java" target-dir="src/com/phonegap/reminder" />
 		<source-file src="src/android/ReminderLauncher.java" target-dir="src/com/phonegap/reminder" />
         <source-file src="src/android/ReminderService.java" target-dir="src/com/phonegap/reminder" />
-		<source-file src="src/android/RunningInterface.java" target-dir="src/com/phonegap/reminder" />
+	<source-file src="src/android/RunningInterface.java" target-dir="src/com/phonegap/reminder" />
 
-		<resource-file src="src/android/icon/drawable-mdpi/ic_billclick_large.png" target="res/drawable/ic_billclick_large.png" />
+	<resource-file src="src/android/icon/drawable-mdpi/ic_billclick_large.png" target="res/drawable/ic_billclick_large.png" />
 		
-		<resource-file src="src/android/icon/drawable-hdpi/ic_billclick_large.png" target="res/drawable-hdpi/ic_billclick_large.png" />
-		<resource-file src="src/android/icon/drawable-mdpi/ic_billclick_large.png" target="res/drawable-mdpi/ic_billclick_large.png" />
-		<resource-file src="src/android/icon/drawable-xhdpi/ic_billclick_large.png" target="res/drawable-xhdpi/ic_billclick_large.png" />
-		<resource-file src="src/android/icon/drawable-xxhdpi/ic_billclick_large.png" target="res/drawable-xxhdpi/ic_billclick_large.png" />
+	<resource-file src="src/android/icon/drawable-hdpi/ic_billclick_large.png" target="res/drawable-hdpi/ic_billclick_large.png" />
+	<resource-file src="src/android/icon/drawable-mdpi/ic_billclick_large.png" target="res/drawable-mdpi/ic_billclick_large.png" />
+	<resource-file src="src/android/icon/drawable-xhdpi/ic_billclick_large.png" target="res/drawable-xhdpi/ic_billclick_large.png" />
+	<resource-file src="src/android/icon/drawable-xxhdpi/ic_billclick_large.png" target="res/drawable-xxhdpi/ic_billclick_large.png" />
 		
     </platform>
 
