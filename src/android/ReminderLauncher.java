@@ -2,6 +2,7 @@ package com.phonegap.reminder;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,11 +20,18 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.location.LocationProvider;
 
-public class ReminderLauncher extends CordovaPlugin implements NotificationInterface, RunningInterface{
+
+public class ReminderLauncher extends CordovaPlugin implements NotificationInterface, RunningInterface, LocationListener{
 
 	public static final String ACTION_START = "start";
 	public static final String ACTION_CLEAR = "clear";
+	public static final String ACTION_REQUEST_PROVIDER = "request";
 	public static final String ACTION_IS_RUNNING = "isrunning";
 	
 	private String title;
@@ -34,6 +42,15 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 	private boolean closeApp;
 	private String stopDate;
 	private float distanceTolerance;
+	private boolean movingStatusChange;
+	
+	// wait at the beginning
+	private long startTime;
+	private long warmUpTime = 5000;
+	private LocationManager locationManager;
+	
+	private boolean providerEnabled = true;
+	private int providerStatus = LocationProvider.OUT_OF_SERVICE;
 	
 	private Activity thisAct;
 	private CallbackContext callCtx;
@@ -43,6 +60,10 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 		try {
 			
 			thisAct = this.cordova.getActivity();
+			
+			callCtx = callbackContext;
+			
+			startTime = System.currentTimeMillis();
 			
 			if (ACTION_START.equalsIgnoreCase(action)) {
 				
@@ -59,13 +80,21 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 				
 				distanceTolerance = (float)args.getDouble(7);
 				
-				callCtx = callbackContext;
+				movingStatusChange = args.getBoolean(8);
+				
 				startReminderService();
 				return true;
 			}
 			else if(ACTION_CLEAR.equalsIgnoreCase(action)){
 				stopReminderService();
 				callbackContext.success();
+				return true;
+			}
+			else if(ACTION_REQUEST_PROVIDER.equalsIgnoreCase(action)){
+				PluginResult r = new PluginResult(PluginResult.Status.NO_RESULT);
+				r.setKeepCallback(true);
+				callbackContext.sendPluginResult(r);
+				requestLocationAccurancy();
 				return true;
 			}
 			else if(ACTION_IS_RUNNING.equalsIgnoreCase(action)){
@@ -103,6 +132,7 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 			mServiceIntent.putExtra("whistle", whistle);
 			mServiceIntent.putExtra("stopDate", stopDate);
 			mServiceIntent.putExtra("distanceTolerance", distanceTolerance);
+			mServiceIntent.putExtra("movingStatusChange", movingStatusChange);
 			mServiceIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 			
 			thisAct.startService(mServiceIntent);
@@ -125,6 +155,24 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 		thisAct.stopService(mServiceIntent);
 	}
 	
+	private void requestLocationAccurancy(){
+		
+		Criteria c = new Criteria();
+        c.setAccuracy(Criteria.ACCURACY_COARSE);
+        c.setHorizontalAccuracy(DESIRED_LOCATION_ACCURANCY_HIGH);
+        c.setPowerRequirement(Criteria.POWER_HIGH);
+
+        locationManager = (LocationManager) thisAct.getSystemService(Context.LOCATION_SERVICE);
+        final String PROVIDER = locationManager.getBestProvider(c,true);
+
+        locationManager.requestLocationUpdates(PROVIDER, 0, 0, this);
+        
+	}
+	
+	private boolean timeWarmUpOut(){
+		return System.currentTimeMillis() >= (startTime + warmUpTime);
+	}
+	
 	public boolean isRunning() {
 		ActivityManager manager = (ActivityManager) thisAct.getSystemService(thisAct.ACTIVITY_SERVICE);
 	    for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
@@ -137,4 +185,41 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 	
 	public void setRunning(boolean running) {}
 	
+    @Override
+    public void onLocationChanged(Location location) {
+		
+		if(!timeWarmUpOut()){
+			return;
+		}
+		
+		try{
+			
+			JSONObject jsonObj = new JSONObject();
+            jsonObj.put("accurancy", location.getAccuracy());
+            jsonObj.put("provider_enabled", providerEnabled);
+            jsonObj.put("out_of_service", (LocationProvider.OUT_OF_SERVICE == providerStatus ? true : false));
+			
+			callCtx.sendPluginResult(new PluginResult(PluginResult.Status.OK, jsonObj));
+			
+		}
+        catch (JSONException e){
+			callCtx.sendPluginResult(new PluginResult(PluginResult.Status.JSON_EXCEPTION));
+        }
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+		providerStatus = status;
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+		providerEnabled = true;
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+		providerEnabled = false;
+    }
+    
 }

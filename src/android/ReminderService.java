@@ -40,10 +40,11 @@ public class ReminderService extends Service implements LocationListener, Notifi
 	private boolean whistle;
 	private String stopDate;
 	private float distanceTolerance;
+	private boolean movingStatusChange;
 	
 	private float radiusDistance;
 	private float linearDistance;
-	private Integer desiredAccuracy = 100;
+	private Integer desiredAccuracy = 0;
 	private long currentMsTime;
 	private int stopServiceDate = -1;
 	
@@ -51,6 +52,12 @@ public class ReminderService extends Service implements LocationListener, Notifi
 	private Thread triggerService = null;
 	
 	private boolean locSubscribed = false;
+	
+	private boolean goToHold = false;
+	
+	// wait at the beginning
+	private long startTime;
+	private long warmUpTime = 5000;
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -62,6 +69,7 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		whistle = intent.getExtras().getBoolean("whistle");
 		stopDate = intent.getExtras().getString("stopDate");
 		distanceTolerance = intent.getExtras().getFloat("distanceTolerance");
+		movingStatusChange = intent.getExtras().getBoolean("movingStatusChange");
 		
 		if(STOP_SERVICE_DATE_TOMORROW.equalsIgnoreCase(stopDate)){
 			Calendar calendar = Calendar.getInstance();
@@ -79,7 +87,8 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		lastloc.setLongitude(0);
 		lastloc.setLatitude(0);
 		
-		currentMsTime = System.currentTimeMillis();
+		startTime = System.currentTimeMillis();
+		currentMsTime = startTime;
 		
 		final ReminderService thisObj = this;
 		
@@ -98,7 +107,7 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		                
 		                Criteria c = new Criteria();
 		                c.setAccuracy(Criteria.ACCURACY_COARSE);
-		                c.setHorizontalAccuracy(translateDesiredAccuracy(desiredAccuracy));
+		                c.setHorizontalAccuracy(DESIRED_LOCATION_ACCURANCY_HIGH);
 		                c.setPowerRequirement(Criteria.POWER_HIGH);
 		                
 		                locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -161,6 +170,10 @@ public class ReminderService extends Service implements LocationListener, Notifi
 	
 	private boolean timeOut(){
 		return System.currentTimeMillis() >= (currentMsTime + interval);
+	}
+	
+	private boolean timeWarmUpOut(){
+		return System.currentTimeMillis() >= (startTime + warmUpTime);
 	}
 	
 	private boolean handleServiceStop(){
@@ -244,10 +257,22 @@ public class ReminderService extends Service implements LocationListener, Notifi
 			return;
 		}
 		
-		float distanceStep = lastloc.distanceTo(location);
-		
-		if(distanceStep < distanceTolerance){
+		if(!timeWarmUpOut()){
 			return;
+		}
+		
+		float distanceStep = lastloc.distanceTo(location);
+		boolean isStanding = goToHold;
+		
+		if(!movingStatusChange && distanceStep < distanceTolerance){
+			return;
+		}
+		else if(movingStatusChange && distanceStep < distanceTolerance){
+			distanceStep = 0;
+			goToHold = true;
+		}
+		else if(movingStatusChange && distanceStep >= distanceTolerance){
+			goToHold = false;
 		}
 		
 		if(startLoc.getLatitude() == 0 && startLoc.getLongitude() == 0){
@@ -261,11 +286,30 @@ public class ReminderService extends Service implements LocationListener, Notifi
 			lastloc.set(location);
 		}
 		
-		if( linearDistance >= distance && timeOut()){
+		/*
+		 * 1.) either a certain distance is reached
+		 * 2.) or user's moving is changed (run -> stop, stop -> run)
+		 * either way a certain time has to be passed
+		 */
+		if( ((!movingStatusChange && linearDistance >= distance) || 
+		    (movingStatusChange && isStanding != goToHold)) && 
+		    timeOut()
+		){
+			
 			startLoc.set(location);
-			showNotification();
+			
+			/*
+			 * 1.) show notification when time and distance is reached
+			 * 2.) show notification when user came to a stop
+			 */
+			if(!movingStatusChange || (movingStatusChange && goToHold)){
+				showNotification();
+			}
+			
 			linearDistance = 0;
 			currentMsTime = System.currentTimeMillis();
+			goToHold = isStanding;
+			
 		}
 		
 	}
@@ -291,24 +335,4 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		return null;
 	}
 	
-	private Integer translateDesiredAccuracy(Integer accuracy) {
-		switch (accuracy) {
-		case 1000:
-		accuracy = Criteria.ACCURACY_LOW;
-		break;
-		case 100:
-		accuracy = Criteria.ACCURACY_MEDIUM;
-		break;
-		case 10:
-		accuracy = Criteria.ACCURACY_HIGH;
-		break;
-		case 0:
-		accuracy = Criteria.ACCURACY_HIGH;
-		break;
-		default:
-		accuracy = Criteria.ACCURACY_MEDIUM;
-		}
-		return accuracy;
-	}
-
 }

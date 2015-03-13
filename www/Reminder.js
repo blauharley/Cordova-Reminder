@@ -39,6 +39,7 @@ module.exports = {
             closeApp: true
             stopDate: "forever" ("forever" | "tomorrow")
             distanceTolerance: 10 (in meters)
+            movingStatusChange: false
         }
     */
     start : function (successCallback, errorCallback, options) {
@@ -53,8 +54,9 @@ module.exports = {
         var closeApp = options.closeApp != undefined ? options.closeApp : true;
         var stopDate = options.stopDate != undefined ? options.stopDate : "forever";
         var distanceTolerance = options.distanceTolerance != undefined ? options.distanceTolerance : 10;
+        var movingStatusChange = options.movingStatusChange != undefined ? options.movingStatusChange : false;
 
-        var args = [title,content,interval,distance,whistle,closeApp,stopDate,distanceTolerance];
+        var args = [title,content,interval,distance,whistle,closeApp,stopDate,distanceTolerance,movingStatusChange];
 
         exec(successCallback, errorCallback, "Reminder", "start", args);
     },
@@ -70,6 +72,23 @@ module.exports = {
     */
     clear : function (successCallback, errorCallback) {
         exec(successCallback, errorCallback, "Reminder", "clear", []);
+    },
+
+    /*
+     @info
+     request provider
+
+     @params
+
+     successCallback: Function
+     @param accurancy:integer
+     @param provider_enabled:boolean
+     @param out_of_service:boolean
+
+     errorCallback: Function
+     */
+    requestProvider : function (successCallback, errorCallback) {
+        exec(successCallback, errorCallback, "Reminder", "request", []);
     },
 
     /*
