@@ -1,3 +1,5 @@
+<h3>Experimental-Project</h3>
+
 This Cordova-Plugin enables users to get notified by Reminder-Notifications when they reach a certain <b>linear-distance</b> and time-<b>interval</b>. Therefore showing Reminder-Notifications bases on how far user have gone in meters and whether a certain time has gone.
 
 <h3>Start a Reminder-Notification</h3>
