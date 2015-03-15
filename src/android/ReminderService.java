@@ -53,7 +53,7 @@ public class ReminderService extends Service implements LocationListener, Notifi
 	
 	private boolean locSubscribed = false;
 	
-	private boolean goToHold = false;
+	private boolean goToHold = true;
 	
 	// wait at the beginning
 	private long startTime;
