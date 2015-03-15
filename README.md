@@ -35,7 +35,7 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications when
        console.log("Reminder started")
     },
     function(e){
-       console.log("Reminder started error",e);
+       console.log("Reminder started error: ",e);
     },
     {
        title: "This is a title",
@@ -73,7 +73,7 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications when
        console.log("Reminder cleared")
     },
     function(e){
-       console.log("Reminder cleared error",e);
+       console.log("Reminder cleared error: ",e);
     }
  );
 
@@ -96,10 +96,38 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications when
 ```javascript
 
  Reminder.isRunning(function(result){
-      console.log("Reminder isRunning",result.isRunning);
+      console.log("Reminder isRunning: ",result.isRunning);
  },
  function(e){
-      console.log("Reminder isRunning error",e);
+      console.log("Reminder isRunning error: ",e);
+ });
+
+```
+
+
+<h3>Make a request to GPS-Provider</h3>
+
+<blockquote>
+
+  <p><b>Reminder.requestProvider( out success:Function, out error:Function ) : undefined</b></p>
+
+  <p>@param <b><i>success</i></b> must be a Function to be called when all went right and a result is returned as <i>Object</i>-parameters containing <i>accurancy</i>, <i>provider_enabled</i> and <i>out_of_service</i></p>
+  <p>@param <b><i>error</i></b> must be a Function to be called when there has been an error.</p>
+
+  <p>@return undefined</p>
+	
+</blockquote>
+
+```javascript
+
+ Reminder.requestProvider(function(info){
+      console.log("Reminder requestProvider: ",info);
+      console.log("Reminder requestProvider accurancy: ",info.accurancy);
+      console.log("Reminder provider enabled: ",info.provider_enabled);
+      console.log("Reminder out of service: ",info.out_of_service);	
+ },
+ function(e){
+      console.log("Reminder requestProvider",e);
  });
 
 ```
