@@ -20,7 +20,8 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications when
 	  <li><b><i>whistle</i></b> must be a Boolean to enable/disable Whistle-Sound, </br><b>default: true</b></li>
 	  <li><b><i>closeApp</i></b> must be a Boolean to-close/not-to-close App, </br><b>default: true</b></li>
 	  <li><b><i>stopDate</i></b> must be a String to indicate Reminder should run forever or being stopped next Day, ("forever" | "tomorrow") </br><b>default: "forever"</b></li>
-      <li><b><i>distanceTolerance</i></b> must be a Number to omit possibly fluctuations, by default all little distance-alterations are taken into consideration. </br><b>default: 10</b></li>
+          <li><b><i>distanceTolerance</i></b> must be a Number to omit possibly fluctuations, by default all little distance-alterations are taken into consideration. </br><b>default: 10</b></li>
+	  <li><b><i>movingStatusChange</i></b> must be a Boolean to tell Reminder to show Reminder-Notifications after User came to a stop while coming under <i>distanceTolerance</i>. Otherwise Reminder shows Reminder-Notifications after reaching <i>distance</i> and <i>interval</i>. Advice: after experimenting with <i>distanceTolerance</i> and <i>movingStatusChange</i> set to true it turned out that while moving by foot <i>distanceTolerance</i> should not be larger than 2 and while moving by car <i>distanceTolerance</i> should at least set to 6</br><b>default: false</b></li>	
 	</ul>
   </p>
 
@@ -49,9 +50,6 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications when
  );
 
 ```
-
-<p>A Reminder-Notification is shown when adjusted <b><i>distance</i></b>(linear-distance) and <b><i>interval</i></b> is reached.</p>
-
 
 <h3>Clear/Cancel a Remind-Notification</h3>
 
