@@ -1,5 +1,3 @@
-<h3>Experimental-Project</h3>
-
 This Cordova-Plugin enables users to get notified by Reminder-Notifications when they reach a certain <b>linear-distance</b> and time-<b>interval</b>. Therefore showing Reminder-Notifications bases on how far user have gone in meters and whether a certain time has gone.
 
 <h3>Start a Reminder-Notification</h3>
@@ -20,7 +18,8 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications when
 	  <li><b><i>whistle</i></b> must be a Boolean to enable/disable Whistle-Sound, </br><b>default: true</b></li>
 	  <li><b><i>closeApp</i></b> must be a Boolean to-close/not-to-close App, </br><b>default: true</b></li>
 	  <li><b><i>stopDate</i></b> must be a String to indicate Reminder should run forever or being stopped next Day, ("forever" | "tomorrow") </br><b>default: "forever"</b></li>
-      <li><b><i>distanceTolerance</i></b> must be a Number to omit possibly fluctuations, by default all little distance-alterations are taken into consideration. </br><b>default: 10</b></li>
+          <li><b><i>distanceTolerance</i></b> must be a Number to omit possibly fluctuations, by default all little distance-alterations are taken into consideration. </br><b>default: 10</b></li>
+	  <li><b><i>movingStatusChange</i></b> must be a Boolean to tell Reminder to show Reminder-Notifications after User came to a stop while coming under <i>distanceTolerance</i>. Otherwise Reminder shows Reminder-Notifications after reaching <i>distance</i> and <i>interval</i>. Advice: after experimenting with <i>distanceTolerance</i> and <i>movingStatusChange</i> set to true it turned out that while moving by foot <i>distanceTolerance</i> should not be larger than 2 and while moving by car <i>distanceTolerance</i> should at least set to 6</br><b>default: false</b></li>	
 	</ul>
   </p>
 
@@ -35,7 +34,7 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications when
        console.log("Reminder started")
     },
     function(e){
-       console.log("Reminder started error",e);
+       console.log("Reminder started error: ",e);
     },
     {
        title: "This is a title",
@@ -49,9 +48,6 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications when
  );
 
 ```
-
-<p>A Reminder-Notification is shown when adjusted <b><i>distance</i></b>(linear-distance) and <b><i>interval</i></b> is reached.</p>
-
 
 <h3>Clear/Cancel a Remind-Notification</h3>
 
@@ -73,7 +69,7 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications when
        console.log("Reminder cleared")
     },
     function(e){
-       console.log("Reminder cleared error",e);
+       console.log("Reminder cleared error: ",e);
     }
  );
 
@@ -96,10 +92,38 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications when
 ```javascript
 
  Reminder.isRunning(function(result){
-      console.log("Reminder isRunning",result.isRunning);
+      console.log("Reminder isRunning: ",result.isRunning);
  },
  function(e){
-      console.log("Reminder isRunning error",e);
+      console.log("Reminder isRunning error: ",e);
+ });
+
+```
+
+
+<h3>Make a request to GPS-Provider</h3>
+
+<blockquote>
+
+  <p><b>Reminder.requestProvider( out success:Function, out error:Function ) : undefined</b></p>
+
+  <p>@param <b><i>success</i></b> must be a Function to be called when all went right and a result is returned as <i>Object</i>-parameters containing <i>accurancy</i>, <i>provider_enabled</i> and <i>out_of_service</i></p>
+  <p>@param <b><i>error</i></b> must be a Function to be called when there has been an error.</p>
+
+  <p>@return undefined</p>
+	
+</blockquote>
+
+```javascript
+
+ Reminder.requestProvider(function(info){
+      console.log("Reminder requestProvider: ",info);
+      console.log("Reminder requestProvider accurancy: ",info.accurancy);
+      console.log("Reminder provider enabled: ",info.provider_enabled);
+      console.log("Reminder out of service: ",info.out_of_service);	
+ },
+ function(e){
+      console.log("Reminder requestProvider",e);
  });
 
 ```
