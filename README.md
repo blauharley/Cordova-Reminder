@@ -1,5 +1,3 @@
-<h3>Experimental-Project</h3>
-
 This Cordova-Plugin enables users to get notified by Reminder-Notifications based on destination coordinates, distance, movement and time.
 
 <h3>Start a Reminder-Notification</h3>
