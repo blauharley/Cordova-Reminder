@@ -29,6 +29,11 @@ import java.util.Calendar;
 public class ReminderService extends Service implements LocationListener, NotificationInterface{
 	
 	private final static String name = "ReminderService";
+	
+	private final static String AIM_MODE = "aim";
+	private final static String TRACK_MODE = "track";
+	private final static String STATUS_MODE = "status";
+	
 	private Location startLoc;
 	private Location lastloc;
 	private LocationManager locationManager;
@@ -40,7 +45,8 @@ public class ReminderService extends Service implements LocationListener, Notifi
 	private boolean whistle;
 	private String stopDate;
 	private float distanceTolerance;
-	private boolean movingStatusChange;
+	private String mode;
+	private Location locAim;
 	
 	private float radiusDistance;
 	private float linearDistance;
@@ -69,7 +75,7 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		whistle = intent.getExtras().getBoolean("whistle");
 		stopDate = intent.getExtras().getString("stopDate");
 		distanceTolerance = intent.getExtras().getFloat("distanceTolerance");
-		movingStatusChange = intent.getExtras().getBoolean("movingStatusChange");
+		mode = intent.getExtras().getString("mode");
 		
 		if(STOP_SERVICE_DATE_TOMORROW.equalsIgnoreCase(stopDate)){
 			Calendar calendar = Calendar.getInstance();
@@ -86,6 +92,13 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		lastloc = new Location("");
 		lastloc.setLongitude(0);
 		lastloc.setLatitude(0);
+		
+		double aimLat = intent.getExtras().getDouble("aimLat");
+		double aimLong = intent.getExtras().getDouble("aimLong");
+		
+		locAim = new Location("");
+		locAim.setLongitude(aimLong);
+		locAim.setLatitude(aimLat);
 		
 		startTime = System.currentTimeMillis();
 		currentMsTime = startTime;
@@ -261,55 +274,14 @@ public class ReminderService extends Service implements LocationListener, Notifi
 			return;
 		}
 		
-		float distanceStep = lastloc.distanceTo(location);
-		boolean isStanding = goToHold;
-		
-		if(!movingStatusChange && distanceStep < distanceTolerance){
-			return;
+		if(mode.equalsIgnoreCase(AIM_MODE)){
+			handleAimModeByLocation(location);
 		}
-		else if(movingStatusChange && distanceStep < distanceTolerance){
-			distanceStep = 0;
-			goToHold = true;
+		else if(mode.equalsIgnoreCase(TRACK_MODE)){
+			handleTrackModeByLocation(location);
 		}
-		else if(movingStatusChange && distanceStep >= distanceTolerance){
-			goToHold = false;
-		}
-		
-		if(startLoc.getLatitude() == 0 && startLoc.getLongitude() == 0){
-			linearDistance = 0;
-			startLoc.set(location);
-			lastloc.set(location);
-		}
-		else{
-			linearDistance += distanceStep;
-			radiusDistance = startLoc.distanceTo(location);
-			lastloc.set(location);
-		}
-		
-		/*
-		 * 1.) either a certain distance is reached
-		 * 2.) or user's moving is changed (run -> stop, stop -> run)
-		 * either way a certain time has to be passed
-		 */
-		if( ((!movingStatusChange && linearDistance >= distance) || 
-		    (movingStatusChange && isStanding != goToHold)) && 
-		    timeOut()
-		){
-			
-			startLoc.set(location);
-			
-			/*
-			 * 1.) show notification when time and distance is reached
-			 * 2.) show notification when user came to a stop
-			 */
-			if(!movingStatusChange || (movingStatusChange && goToHold)){
-				showNotification();
-			}
-			
-			linearDistance = 0;
-			currentMsTime = System.currentTimeMillis();
-			goToHold = isStanding;
-			
+		else if(mode.equalsIgnoreCase(STATUS_MODE)){
+			handleStatusModeByLocation(location);
 		}
 		
 	}
@@ -334,5 +306,113 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	private void handleAimModeByLocation(Location location){
+		
+		float distanceStep = lastloc.distanceTo(location);
+		float distanceToAim = location.distanceTo(locAim);
+		
+		if(startLoc.getLatitude() == 0 && startLoc.getLongitude() == 0){
+			linearDistance = 0;
+			startLoc.set(location);
+			lastloc.set(location);
+		}
+		else{
+			linearDistance += distanceStep;
+			radiusDistance = startLoc.distanceTo(location);
+			lastloc.set(location);
+		}
+		
+		/*
+		 * show notification when user has entered aim area
+		 */
+		if( distanceToAim < distanceTolerance && timeOut() ){
+			
+			startLoc.set(location);
+			
+			showNotification();
+			
+			linearDistance = 0;
+			currentMsTime = System.currentTimeMillis();
+			
+		}
+		
+	}
+	
+	private void handleTrackModeByLocation(Location location){
+		
+		float distanceStep = lastloc.distanceTo(location);
+		
+		if(distanceStep < distanceTolerance){
+			return;
+		}
+		
+		if(startLoc.getLatitude() == 0 && startLoc.getLongitude() == 0){
+			linearDistance = 0;
+			startLoc.set(location);
+			lastloc.set(location);
+		}
+		else{
+			linearDistance += distanceStep;
+			radiusDistance = startLoc.distanceTo(location);
+			lastloc.set(location);
+		}
+		
+		/*
+		 * show notification when time and distance is reached
+		 */
+		if( linearDistance >= distance && timeOut() ){
+			
+			startLoc.set(location);
+			
+			showNotification();
+			
+			linearDistance = 0;
+			currentMsTime = System.currentTimeMillis();
+			
+		}
+		
+	}
+	
+	private void handleStatusModeByLocation(Location location){
+		
+		float distanceStep = lastloc.distanceTo(location);
+		boolean isStanding = goToHold;
+		
+		if(distanceStep < distanceTolerance){
+			distanceStep = 0;
+			goToHold = true;
+		}
+		else if(distanceStep >= distanceTolerance){
+			goToHold = false;
+		}
+		
+		if(startLoc.getLatitude() == 0 && startLoc.getLongitude() == 0){
+			linearDistance = 0;
+			startLoc.set(location);
+			lastloc.set(location);
+		}
+		else{
+			linearDistance += distanceStep;
+			radiusDistance = startLoc.distanceTo(location);
+			lastloc.set(location);
+		}
+		
+		/*
+		 * show notification when user came to a stop
+		 */
+		if( isStanding != goToHold && goToHold && timeOut() ){
+			
+			startLoc.set(location);
+			
+			showNotification();
+			
+			linearDistance = 0;
+			currentMsTime = System.currentTimeMillis();
+			goToHold = isStanding;
+			
+		}
+		
+	}	
 	
 }

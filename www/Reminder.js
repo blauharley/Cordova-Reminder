@@ -52,11 +52,14 @@ module.exports = {
         var distance = options.distance ? options.distance : 100;
         var whistle = options.whistle != undefined ? options.whistle : true;
         var closeApp = options.closeApp != undefined ? options.closeApp : true;
-        var stopDate = options.stopDate != undefined ? options.stopDate : "forever";
-        var distanceTolerance = options.distanceTolerance != undefined ? options.distanceTolerance : 10;
-        var movingStatusChange = options.movingStatusChange != undefined ? options.movingStatusChange : false;
+        var stopDate = options.stopDate != undefined ? (options.stopDate == "tomorrow" ? "tomorrow" : "forever") : "forever";
 
-        var args = [title,content,interval,distance,whistle,closeApp,stopDate,distanceTolerance,movingStatusChange];
+        var mode = options.mode != undefined ? (options.mode == "aim" ? options.mode : (options.mode == "track" ? "track" : "status")) : "aim";
+        var distanceTolerance = options.distanceTolerance != undefined ? options.distanceTolerance : 10;
+        var aimCoordLat = mode == "aim" ? (options.aimCoord != undefined ? options.aimCoord.lat : 0) : 0;
+        var aimCoordLong = mode == "aim" ? (options.aimCoord != undefined ? options.aimCoord.long : 0) : 0;
+
+        var args = [title,content,interval,distance,whistle,closeApp,stopDate,distanceTolerance,mode,aimCoordLat,aimCoordLong];
 
         exec(successCallback, errorCallback, "Reminder", "start", args);
     },
