@@ -1,4 +1,6 @@
-This Cordova-Plugin enables users to get notified by Reminder-Notifications when they reach a certain <b>linear-distance</b> and time-<b>interval</b>. Therefore showing Reminder-Notifications bases on how far user have gone in meters and whether a certain time has gone.
+<h3>Experimental-Project</h3>
+
+This Cordova-Plugin enables users to get notified by Reminder-Notifications based on destination coordinates, distance, movement and time.
 
 <h3>Start a Reminder-Notification</h3>
 
@@ -11,6 +13,40 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications when
   <p>
 	@param <b><i>options</i></b> must be an Object to be given to adjust some Preferences:
 	<ul>
+	  <li><b><i>mode</i></b> must be a String to determine whether to show a Reminder-Notification on "aim", "track" or "status", </br><b>default: "aim"</b>
+             <ul>
+		<li>
+		  "aim": show Reminder-Notifcation when an user reaches a certain aim/destination.</br>
+                  required properties:
+		  <ul>
+		     <li>
+                        <b><i>distanceTolerance</i></b> is considered to be the radius of the aim/destination in meter.
+			<b><i>aimCoord</i></b> must be an Object that holds lat/long properties to determine the location of aim/destination.</br><b>lat: 0, long: 0</b>
+		     </li>
+		  </ul>
+
+                  "track": show Reminder-Notifcation when an user reaches a certain distance.</br>
+                  required properties:
+		  <ul>
+		     <li>
+                        <b><i>distance</i></b> is considered how far an user has gone in meter.
+		     </li>
+		  </ul>
+			
+                  "status": show Reminder-Notifcation when an user comes to a stop</br>
+                  required properties:
+		  <ul>
+		     <li>
+                        <b><i>distanceTolerance</i></b> is considered how fast an user has to change stop/go movements in meter.</br>
+			<b><i>interval</i></b> is considered how fast an user has to change stop/go movements in milliseconds.
+		     </li>
+		  </ul>
+
+		</li>
+
+	     </ul>
+         </li>
+         <li><b><i>distanceTolerance</i></b> must be a Number to omit possibly fluctuations, by default all little distance-alterations are taken into consideration. </br><b>default: 10</b></li>
 	  <li><b><i>title</i></b> must be a String to be shown as title within Reminder-Notification, </br><b>default: "Reminder-Notification"</b></li>
 	  <li><b><i>content</i></b> must be a String to be shown as content-text within a Reminder-Notification. Within content there can be a #ML-Notation(linear-distance) that is replaced by the actual gone meters and #MR(radius-distance) for instance "You went #ML meters! within a radius of #MR" is shown within a Reminder-Notification where #ML/#MR are Numbers representing linear/radius-distance.</br> <b>default: "Reminder-Content"</b></li>
 	  <li><b><i>interval</i></b> must be a Number in Milliseconds to be gone to show a Reminder-Notification, </br><b>default: 60000(1 minute)</b></li>
@@ -18,8 +54,6 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications when
 	  <li><b><i>whistle</i></b> must be a Boolean to enable/disable Whistle-Sound, </br><b>default: true</b></li>
 	  <li><b><i>closeApp</i></b> must be a Boolean to-close/not-to-close App, </br><b>default: true</b></li>
 	  <li><b><i>stopDate</i></b> must be a String to indicate Reminder should run forever or being stopped next Day, ("forever" | "tomorrow") </br><b>default: "forever"</b></li>
-          <li><b><i>distanceTolerance</i></b> must be a Number to omit possibly fluctuations, by default all little distance-alterations are taken into consideration. </br><b>default: 10</b></li>
-	  <li><b><i>movingStatusChange</i></b> must be a Boolean to tell Reminder to show Reminder-Notifications after User came to a stop while coming under <i>distanceTolerance</i>. Otherwise Reminder shows Reminder-Notifications after reaching <i>distance</i> and <i>interval</i>. Advice: after experimenting with <i>distanceTolerance</i> and <i>movingStatusChange</i> set to true it turned out that while moving by foot <i>distanceTolerance</i> should not be larger than 2 and while moving by car <i>distanceTolerance</i> should at least set to 6</br><b>default: false</b></li>	
 	</ul>
   </p>
 
@@ -27,27 +61,71 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications when
 	
 </blockquote>
 
+<h4>A Reminder-Notification example of all modes:</h4>
+
+<p><b><i>"aim"</i></b>: When a user has reached a certain aim/destination whithin 30 meters and 1 minute has passed(default) a Reminder-Notification is shown</p>
+
 ```javascript
 
- Reminder.start(
-    function(){
-       console.log("Reminder started")
+ Reminder.start(function(){
+    console.log("Reminder success")
+ },
+ function(e){
+    console.log("Reminder error",e);
+ },{
+    title: "Reminder",
+    content: "You have reached your destination!",
+    mode: "aim",
+    // required properties
+    aimCoord:{
+        lat:40.97989806,
+        long:-95.2734375
     },
-    function(e){
-       console.log("Reminder started error: ",e);
-    },
-    {
-       title: "This is a title",
-       content: "You have gone #ML meters within a #MR radius",
-       interval: 60000,
-       distance: 100,
-       whistle: false,
-       closeApp: false,
-       stopDate: "tomorrow"
-    }
- );
+    distanceTolerance: 30
+ });
 
 ```
+
+<p><b><i>"track"</i></b>: When an user has gone 150 meter and 10 seconds have passed a Reminder-Notification is shown</p>
+
+```javascript
+
+ Reminder.start(function(){
+    console.log("Reminder success")
+ },
+ function(e){
+    console.log("Reminder error",e);
+ },{
+    title: "Reminder",
+    content: "You have gone #ML within a radius of #MR in meter!",
+    interval: 10000,
+    mode: "track",
+    // required properties
+    distance: 150
+ });
+
+```
+
+<p><b><i>"status"</i></b>: All 45 seconds when an user has come to a stop a Reminder-Notification is shown</p>
+
+```javascript
+
+ Reminder.start(function(){
+    console.log("Reminder success")
+ },
+ function(e){
+    console.log("Reminder error",e);
+ },{
+    title: "Reminder",
+    content: "You have come to a stop while you have gone #ML in meter!",
+    mode: "status",
+    // required properties
+    interval: 45000,
+    distanceTolerance: 2
+ });
+
+```
+
 
 <h3>Clear/Cancel a Remind-Notification</h3>
 
@@ -69,7 +147,7 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications when
        console.log("Reminder cleared")
     },
     function(e){
-       console.log("Reminder cleared error: ",e);
+       console.log("Reminder cleared error",e);
     }
  );
 
@@ -92,14 +170,13 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications when
 ```javascript
 
  Reminder.isRunning(function(result){
-      console.log("Reminder isRunning: ",result.isRunning);
+      console.log("Reminder isRunning",result.isRunning);
  },
  function(e){
-      console.log("Reminder isRunning error: ",e);
+      console.log("Reminder isRunning error",e);
  });
 
 ```
-
 
 <h3>Make a request to GPS-Provider</h3>
 
