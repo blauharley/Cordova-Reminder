@@ -112,7 +112,7 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications base
 
 ```
 
-<p><b><i>"status"</i></b>: All 45 seconds when an user has come to a stop a Reminder-Notification is shown</p>
+<p><b><i>"status"</i></b>: All 45 seconds it is tested whether an user goes slower than 4 meter per second a Reminder-Notification is shown</p>
 
 ```javascript
 
@@ -127,7 +127,7 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications base
     mode: "status",
     // required properties
     interval: 45000,
-    distanceTolerance: 2
+    speedMsTolerance: 4
  });
 
 ```
