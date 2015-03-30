@@ -13,7 +13,7 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications base
   <p>
 	@param <b><i>options</i></b> must be an Object to be given to adjust some Preferences:
 	<ul>
-	  <li><b><i>mode</i></b> must be a String to determine whether to show a Reminder-Notification on "aim", "track" or "status", </br><b>default: "aim"</b>
+	  <li><b><i>mode</i></b> must be a String to determine whether to show a Reminder-Notification on "aim", "track" or "status" mode, </br><b>default: "aim"</b>
              <ul>
 		<li>
 		  "aim": show Reminder-Notifcation when an user reaches a certain aim/destination.</br>
@@ -21,7 +21,9 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications base
 		  <ul>
 		     <li>
                         <b><i>distanceTolerance</i></b> is considered to be the radius of the aim/destination in meter.
-			<b><i>aimCoord</i></b> must be an Object that holds lat/long properties to determine the location of aim/destination.</br><b>lat: 0, long: 0</b>
+		     </li>
+                     <li>
+                        <b><i>aimCoord</i></b> must be an Object that holds lat/long properties to determine the location of aim/destination.
 		     </li>
 		  </ul>
 
@@ -37,8 +39,10 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications base
                   required properties:
 		  <ul>
 		     <li>
-                        <b><i>distanceTolerance</i></b> is considered how fast an user has to change stop/go movements in meter.</br>
-			<b><i>interval</i></b> is considered how fast an user has to change stop/go movements in milliseconds.
+                        <b><i>speedMsTolerance</i></b> is considered how fast an user has to go in meter per seconds in order to be determined they come to a stop or they still move.
+		     </li>
+                     <li>
+                        <b><i>interval</i></b> is considered how fast an user has to change stop/go movements in milliseconds.
 		     </li>
 		  </ul>
 
@@ -47,7 +51,9 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications base
 	     </ul>
          </li>
          <li><b><i>distanceTolerance</i></b> must be a Number to omit possibly fluctuations, by default all little distance-alterations are taken into consideration. </br><b>default: 10</b></li>
-	  <li><b><i>title</i></b> must be a String to be shown as title within Reminder-Notification, </br><b>default: "Reminder-Notification"</b></li>
+	  <li><b><i>speedMsTolerance</i></b> must be a Number to determine the speed in m/s a user has to fall below. </br><b>default: 10</b></li>
+          <li><b><i>aimCoord</i></b> must be an Object that holds latitude and longitude to determine aim/destination coordinates. </br><b>default: latitude 0, longitude 0</b></li>
+          <li><b><i>title</i></b> must be a String to be shown as title within Reminder-Notification, </br><b>default: "Reminder-Notification"</b></li>
 	  <li><b><i>content</i></b> must be a String to be shown as content-text within a Reminder-Notification. Within content there can be a #ML-Notation(linear-distance) that is replaced by the actual gone meters and #MR(radius-distance) for instance "You went #ML meters! within a radius of #MR" is shown within a Reminder-Notification where #ML/#MR are Numbers representing linear/radius-distance.</br> <b>default: "Reminder-Content"</b></li>
 	  <li><b><i>interval</i></b> must be a Number in Milliseconds to be gone to show a Reminder-Notification, </br><b>default: 60000(1 minute)</b></li>
 	  <li><b><i>distance</i></b> must be a Number in Meter to be reached to show a Reminder-Notification, </br><b>default: 100</b></li>
