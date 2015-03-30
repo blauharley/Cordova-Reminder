@@ -38,8 +38,8 @@ module.exports = {
             whistle: true
             closeApp: true
             stopDate: "forever" ("forever" | "tomorrow")
-            distanceTolerance: 10 (in meters)
-            movingStatusChange: false
+            distanceTolerance: 10
+            speedMsTolerance: 10
         }
     */
     start : function (successCallback, errorCallback, options) {
@@ -55,7 +55,7 @@ module.exports = {
         var stopDate = options.stopDate != undefined ? (options.stopDate == "tomorrow" ? "tomorrow" : "forever") : "forever";
 
         var mode = options.mode != undefined ? (options.mode == "aim" ? options.mode : (options.mode == "track" ? "track" : "status")) : "aim";
-        var distanceTolerance = options.distanceTolerance != undefined ? options.distanceTolerance : 10;
+        var distanceTolerance = mode == "status" ? options.speedMsTolerance : (options.distanceTolerance != undefined ? options.distanceTolerance : 10);
         var aimCoordLat = mode == "aim" ? (options.aimCoord != undefined ? options.aimCoord.lat : 0) : 0;
         var aimCoordLong = mode == "aim" ? (options.aimCoord != undefined ? options.aimCoord.long : 0) : 0;
 
