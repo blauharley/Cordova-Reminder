@@ -92,7 +92,7 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications base
 
 ```
 
-<p><b><i>"track"</i></b>: When an user has gone 150 meter and 10 seconds have passed a Reminder-Notification is shown</p>
+<p><b><i>"track"</i></b>: When an user has gone 150 meter and 10 seconds have passed a Reminder-Notification is shown and do not take 10 meter movement fluctuation into consideration</p>
 
 ```javascript
 
@@ -107,7 +107,8 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications base
     interval: 10000,
     mode: "track",
     // required properties
-    distance: 150
+    distance: 150,
+    distanceTolerance : 10
  });
 
 ```
