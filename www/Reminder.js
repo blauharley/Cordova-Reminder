@@ -23,25 +23,25 @@ var exec = require("cordova/exec");
 module.exports = {
 
     /*
-    @info
-        start reminder
+     @info
+     start reminder
 
-        @params
+     @params
 
-        successCallback: Function
-        errorCallback: Function
-        options:{
-            title : "Reminder-Notification"
-            content: "Reminder-Content"
-            interval: 60000 (in milliseconds)
-            distance: 100 (in meters)
-            whistle: true
-            closeApp: true
-            stopDate: "forever" ("forever" | "tomorrow")
-            distanceTolerance: 10 (in meters)
-            movingStatusChange: false
-        }
-    */
+     successCallback: Function
+     errorCallback: Function
+     options:{
+     title : "Reminder-Notification"
+     content: "Reminder-Content"
+     interval: 60000 (in milliseconds)
+     distance: 100 (in meters)
+     whistle: true
+     closeApp: true
+     stopDate: "forever" ("forever" | "tomorrow")
+     distanceTolerance: 10
+     speedMsTolerance: 10
+     }
+     */
     start : function (successCallback, errorCallback, options) {
 
         options = options || {};
@@ -55,7 +55,7 @@ module.exports = {
         var stopDate = options.stopDate != undefined ? (options.stopDate == "tomorrow" ? "tomorrow" : "forever") : "forever";
 
         var mode = options.mode != undefined ? (options.mode == "aim" ? options.mode : (options.mode == "track" ? "track" : "status")) : "aim";
-        var distanceTolerance = options.distanceTolerance != undefined ? options.distanceTolerance : 10;
+        var distanceTolerance = mode == "status" ? options.speedMsTolerance : (options.distanceTolerance != undefined ? options.distanceTolerance : 10);
         var aimCoordLat = mode == "aim" ? (options.aimCoord != undefined ? options.aimCoord.lat : 0) : 0;
         var aimCoordLong = mode == "aim" ? (options.aimCoord != undefined ? options.aimCoord.long : 0) : 0;
 
@@ -66,13 +66,13 @@ module.exports = {
 
     /*
      @info
-         stop reminder
+     stop reminder
 
-         @params
+     @params
 
-         successCallback: Function
-         errorCallback: Function
-    */
+     successCallback: Function
+     errorCallback: Function
+     */
     clear : function (successCallback, errorCallback) {
         exec(successCallback, errorCallback, "Reminder", "clear", []);
     },
@@ -96,12 +96,12 @@ module.exports = {
 
     /*
      @info
-         check reminder runs
+     check reminder runs
 
-         @params
+     @params
 
-         successCallback: Function
-         errorCallback: Function
+     successCallback: Function
+     errorCallback: Function
      */
     isRunning : function (successCallback, errorCallback) {
         exec(successCallback, errorCallback, "Reminder", "isrunning", []);
