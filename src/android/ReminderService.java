@@ -60,6 +60,7 @@ public class ReminderService extends Service implements LocationListener, Notifi
 	private boolean locSubscribed = false;
 
 	private boolean goToHold = true;
+    private boolean exceedSpeed = false;
 
 	// wait at the beginning
 	private long startTime;
@@ -129,9 +130,9 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		        		locationManager.requestLocationUpdates(PROVIDER, 0, 0, thisObj);
 
 	                }
-	                
+
 	                Looper.loop();
-		              
+
 	            }catch(Exception ex){
 	            	
 	            }
@@ -143,7 +144,7 @@ public class ReminderService extends Service implements LocationListener, Notifi
 	    triggerService.start();
 	    
 	    return START_REDELIVER_INTENT;
-	    
+
 	}
 	
 	@Override
@@ -230,7 +231,7 @@ public class ReminderService extends Service implements LocationListener, Notifi
 			        .setAutoCancel(true);
 	
 			int requestID = (int) System.currentTimeMillis();
-			
+
 			PackageManager pm = getPackageManager();
 			Intent resultIntent = pm.getLaunchIntentForPackage(getApplicationContext().getPackageName());
 
@@ -245,7 +246,7 @@ public class ReminderService extends Service implements LocationListener, Notifi
 			);
 
 			builder.setContentIntent(resultPendingIntent);
-			
+
 			NotificationManager mNotificationManager =
 			    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 			
@@ -259,7 +260,7 @@ public class ReminderService extends Service implements LocationListener, Notifi
 			}
 			
 		}
-		
+
 	}
 
 	@Override
@@ -288,7 +289,7 @@ public class ReminderService extends Service implements LocationListener, Notifi
 
 	@Override
 	public void onProviderDisabled(String provider) {
-		
+
 	}
 
 	@Override
@@ -389,6 +390,10 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		}
 		else{
 			goToHold = false;
+            /*
+            * user has to exceed speed once in order to make sure they'll come to a stop
+            */
+            exceedSpeed = true;
 		}
 
 		if(startLoc.getLatitude() == 0 && startLoc.getLongitude() == 0){
@@ -405,7 +410,7 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		/*
 		 * show notification when user came to a stop
 		 */
-		if(goToHold && timeOut()){
+		if(goToHold && exceedSpeed && timeOut()){
 
 			startLoc.set(location);
 
@@ -415,6 +420,7 @@ public class ReminderService extends Service implements LocationListener, Notifi
 			currentMsTime = System.currentTimeMillis();
             startTime = currentMsTime;
 			goToHold = isStanding;
+            exceedSpeed = false;
 
 		}
 
