@@ -52,7 +52,7 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 	private LocationManager locationManager;
 	
 	private boolean providerEnabled = true;
-	private int providerStatus = LocationProvider.OUT_OF_SERVICE;
+	private int providerStatus = -1;
 	
 	private Activity thisAct;
 	private CallbackContext callCtx;
@@ -202,10 +202,16 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 		try{
 			
 			JSONObject jsonObj = new JSONObject();
+
+            JSONObject position = new JSONObject();
+            position.put("latitude",location.getLatitude());
+            position.put("longitude",location.getLongitude());
+
             jsonObj.put("accurancy", location.getAccuracy());
             jsonObj.put("provider_enabled", providerEnabled);
+            jsonObj.put("position", position);
             jsonObj.put("out_of_service", (LocationProvider.OUT_OF_SERVICE == providerStatus ? true : false));
-			
+
 			callCtx.sendPluginResult(new PluginResult(PluginResult.Status.OK, jsonObj));
 			
 		}

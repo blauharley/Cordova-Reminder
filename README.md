@@ -15,7 +15,6 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications base
 	<ul>
 	  <li><b><i>mode</i></b> must be a String to determine whether to show a Reminder-Notification on "aim", "track" or "status" mode, </br><b>default: "aim"</b>
              <ul>
-
 		<li>
 		  "aim": show Reminder-Notifcation when an user reaches a certain aim/destination.</br>
                   required properties:
@@ -27,9 +26,7 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications base
                         <b><i>aimCoord</i></b> must be an Object that holds lat/long properties to determine the location of aim/destination.
 		     </li>
 		  </ul>
-		</li>
 
-		<li>
                   "track": show Reminder-Notifcation when an user reaches a certain distance.</br>
                   required properties:
 		  <ul>
@@ -37,9 +34,7 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications base
                         <b><i>distance</i></b> is considered how far an user has gone in meter.
 		     </li>
 		  </ul>
-		</li>
-
-		<li>
+			
                   "status": show Reminder-Notifcation when an user comes to a stop</br>
                   required properties:
 		  <ul>
@@ -50,6 +45,7 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications base
                         <b><i>interval</i></b> is considered how fast an user has to change stop/go movements in milliseconds.
 		     </li>
 		  </ul>
+
 		</li>
 
 	     </ul>
