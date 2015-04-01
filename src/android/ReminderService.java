@@ -60,8 +60,7 @@ public class ReminderService extends Service implements LocationListener, Notifi
 	private boolean locSubscribed = false;
 
 	private boolean goToHold = true;
-    private boolean exceedSpeed = false;
-
+    
 	// wait at the beginning
 	private long startTime;
 	private long warmUpTime = 5000;
@@ -126,9 +125,14 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		                
 		                locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 		                final String PROVIDER = locationManager.getBestProvider(c, true);
-
-		        		locationManager.requestLocationUpdates(PROVIDER, 0, 0, thisObj);
-
+						
+						if(mode.equalsIgnoreCase(STATUS_MODE)){
+							locationManager.requestLocationUpdates(PROVIDER, interval, 0, thisObj);
+						}
+						else{
+		        			locationManager.requestLocationUpdates(PROVIDER, 0, 0, thisObj);
+						}
+						
 	                }
 
 	                Looper.loop();
@@ -380,37 +384,31 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		float distanceStep = lastloc.distanceTo(location);
 		boolean isStanding = goToHold;
 
-        double currSpeedMs = radiusDistance/((System.currentTimeMillis() - startTime)/1000);
-
         /*
-        * does user move slower or faster than m/s
+        * has user exceeded radius in meter within a certain time-interval
         */
-		if(currSpeedMs < distanceTolerance){
+		if(distanceStep < distance){
 			goToHold = true;
 		}
 		else{
 			goToHold = false;
-            /*
-            * user has to exceed speed once in order to make sure they'll come to a stop
-            */
-            exceedSpeed = true;
 		}
 
 		if(startLoc.getLatitude() == 0 && startLoc.getLongitude() == 0){
 			linearDistance = 0;
 			startLoc.set(location);
-			lastloc.set(location);
 		}
 		else{
 			linearDistance += distanceStep;
 			radiusDistance = startLoc.distanceTo(location);
-			lastloc.set(location);
 		}
 
+		lastloc.set(location);
+		
 		/*
-		 * show notification when user came to a stop
+		 * show notification when user's movement status changed
 		 */
-		if(goToHold && exceedSpeed && timeOut()){
+		if(isStanding != goToHold){
 
 			startLoc.set(location);
 
@@ -420,7 +418,6 @@ public class ReminderService extends Service implements LocationListener, Notifi
 			currentMsTime = System.currentTimeMillis();
             startTime = currentMsTime;
 			goToHold = isStanding;
-            exceedSpeed = false;
 
 		}
 

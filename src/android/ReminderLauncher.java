@@ -203,15 +203,29 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 			
 			JSONObject jsonObj = new JSONObject();
 
-            JSONObject position = new JSONObject();
-            position.put("latitude",location.getLatitude());
-            position.put("longitude",location.getLongitude());
-
-            jsonObj.put("accurancy", location.getAccuracy());
-            jsonObj.put("provider_enabled", providerEnabled);
-            jsonObj.put("position", position);
-            jsonObj.put("out_of_service", (LocationProvider.OUT_OF_SERVICE == providerStatus ? true : false));
-
+            JSONObject coords = new JSONObject();
+            
+            coords.put("latitude",location.getLatitude());
+            coords.put("longitude",location.getLongitude());
+            
+            coords.put("accurancy", location.getAccuracy());
+            coords.put("provider_enabled", providerEnabled);
+            
+            if(location.hasBearing()){
+            	coords.put("heading", location.getBearing());	
+            }
+            if(location.hasAltitude()){
+            	coords.put("altitude", location.getAltitude());	
+            }
+            if(location.hasSpeed()){
+            	coords.put("speed", location.getSpeed());	
+            }
+            
+            coords.put("out_of_service", (LocationProvider.OUT_OF_SERVICE == providerStatus ? true : false));
+			
+			jsonObj.put("coords",coords);
+			jsonObj.put("timestamp", System.currentTimeMillis());
+			
 			callCtx.sendPluginResult(new PluginResult(PluginResult.Status.OK, jsonObj));
 			
 		}
