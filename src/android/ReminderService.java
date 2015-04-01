@@ -47,7 +47,8 @@ public class ReminderService extends Service implements LocationListener, Notifi
 	private float distanceTolerance;
 	private String mode;
 	private Location locAim;
-
+	private boolean aggressive;
+	
 	private float radiusDistance;
 	private float linearDistance;
 	private Integer desiredAccuracy = 0;
@@ -76,7 +77,8 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		stopDate = intent.getExtras().getString("stopDate");
 		distanceTolerance = intent.getExtras().getFloat("distanceTolerance");
 		mode = intent.getExtras().getString("mode");
-
+		aggressive = intent.getExtras().getBoolean("aggressive");
+		
 		if(STOP_SERVICE_DATE_TOMORROW.equalsIgnoreCase(stopDate)){
 			Calendar calendar = Calendar.getInstance();
 			stopServiceDate = calendar.get(Calendar.DAY_OF_WEEK);
@@ -126,11 +128,11 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		                locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 		                final String PROVIDER = locationManager.getBestProvider(c, true);
 						
-						if(mode.equalsIgnoreCase(STATUS_MODE)){
-							locationManager.requestLocationUpdates(PROVIDER, interval, 0, thisObj);
+						if(aggressive){
+							locationManager.requestLocationUpdates(PROVIDER, 0, 0, thisObj);
 						}
 						else{
-		        			locationManager.requestLocationUpdates(PROVIDER, 0, 0, thisObj);
+		        			locationManager.requestLocationUpdates(PROVIDER, interval, 0, thisObj);
 						}
 						
 	                }
@@ -276,6 +278,8 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		}
 		
 		if(!timeWarmUpOut()){
+			startLoc.set(location);
+			lastloc.set(location);
 			return;
 		}
 		
@@ -317,21 +321,12 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		float distanceStep = lastloc.distanceTo(location);
 		float distanceToAim = location.distanceTo(locAim);
 
-		if(startLoc.getLatitude() == 0 && startLoc.getLongitude() == 0){
-			linearDistance = 0;
-			startLoc.set(location);
-			lastloc.set(location);
-		}
-		else{
-			linearDistance += distanceStep;
-			radiusDistance = startLoc.distanceTo(location);
-			lastloc.set(location);
-		}
-
+		updateStatisticsByStepAndLocation(distanceStep,location);
+		
 		/*
 		 * show notification when user has entered aim area
 		 */
-		if( distanceToAim < distanceTolerance && timeOut() ){
+		if( distanceToAim < distanceTolerance && (!aggressive || (aggressive && timeOut()) ) ){
 
 			startLoc.set(location);
 
@@ -352,21 +347,12 @@ public class ReminderService extends Service implements LocationListener, Notifi
 			return;
 		}
 
-		if(startLoc.getLatitude() == 0 && startLoc.getLongitude() == 0){
-			linearDistance = 0;
-			startLoc.set(location);
-			lastloc.set(location);
-		}
-		else{
-			linearDistance += distanceStep;
-			radiusDistance = startLoc.distanceTo(location);
-			lastloc.set(location);
-		}
+		updateStatisticsByStepAndLocation(distanceStep,location);
 
 		/*
 		 * show notification when time and distance is reached
 		 */
-		if( linearDistance >= distance && timeOut() ){
+		if( linearDistance >= distance && (!aggressive || (aggressive && timeOut()) ) ){
 
 			startLoc.set(location);
 
@@ -398,21 +384,12 @@ public class ReminderService extends Service implements LocationListener, Notifi
 			goToHold = false;
 		}
 
-		if(startLoc.getLatitude() == 0 && startLoc.getLongitude() == 0){
-			linearDistance = 0;
-			startLoc.set(location);
-		}
-		else{
-			linearDistance += distanceStep;
-			radiusDistance = startLoc.distanceTo(location);
-		}
-
-		lastloc.set(location);
+		updateStatisticsByStepAndLocation(distanceStep,location);
 		
 		/*
 		 * show notification when user's movement status changed
 		 */
-		if(isStanding != goToHold){
+		if(isStanding != goToHold && (!aggressive || (aggressive && timeOut()) )){
 
 			startLoc.set(location);
 
@@ -425,6 +402,12 @@ public class ReminderService extends Service implements LocationListener, Notifi
 
 		}
 
+	}
+	
+	private void updateStatisticsByStepAndLocation(float distanceStep,Location location){
+		linearDistance += distanceStep;
+		radiusDistance = startLoc.distanceTo(location);
+		lastloc.set(location);
 	}
 
 }

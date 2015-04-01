@@ -45,6 +45,7 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 	private String mode;
 	private double aimLat;
 	private double aimLong;
+	private boolean aggressive;
 	
 	// wait at the beginning
 	private long startTime;
@@ -79,6 +80,8 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 				closeApp = args.getBoolean(5);
 				
 				stopDate = args.getString(6);
+				
+				aggressive = args.getBoolean(11);
 				
 				distanceTolerance = (float)args.getDouble(7);
 				mode = args.getString(8);
@@ -139,6 +142,7 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 			mServiceIntent.putExtra("mode", mode);
 			mServiceIntent.putExtra("aimLat", aimLat);
 			mServiceIntent.putExtra("aimLong", aimLong);
+			mServiceIntent.putExtra("aggressive", aggressive);
 			
 			mServiceIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 			

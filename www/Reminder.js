@@ -31,15 +31,16 @@ module.exports = {
      successCallback: Function
      errorCallback: Function
      options:{
-     title : "Reminder-Notification"
-     content: "Reminder-Content"
-     interval: 60000 (in milliseconds)
-     distance: 100 (in meters)
-     whistle: true
-     closeApp: true
-     stopDate: "forever" ("forever" | "tomorrow")
-     distanceTolerance: 10
-     speedMsTolerance: 10
+         title : "Reminder-Notification"
+         content: "Reminder-Content"
+         interval: 60000 (in milliseconds)
+         distance: 100 (in meters)
+         whistle: true
+         closeApp: true
+         stopDate: "forever" ("forever" | "tomorrow")
+         distanceTolerance: 10
+         speedMsTolerance: 10
+         aggressive: true
      }
      */
     start : function (successCallback, errorCallback, options) {
@@ -55,11 +56,12 @@ module.exports = {
         var stopDate = options.stopDate != undefined ? (options.stopDate == "tomorrow" ? "tomorrow" : "forever") : "forever";
 
         var mode = options.mode != undefined ? (options.mode == "aim" ? options.mode : (options.mode == "track" ? "track" : "status")) : "aim";
+        var aggressive = options.aggressive != undefined ? options.aggressive : true;
         var distanceTolerance = options.distanceTolerance != undefined ? options.distanceTolerance : 10;
         var aimCoordLat = mode == "aim" ? (options.aimCoord != undefined ? options.aimCoord.lat : 0) : 0;
         var aimCoordLong = mode == "aim" ? (options.aimCoord != undefined ? options.aimCoord.long : 0) : 0;
 
-        var args = [title,content,interval,distance,whistle,closeApp,stopDate,distanceTolerance,mode,aimCoordLat,aimCoordLong];
+        var args = [title,content,interval,distance,whistle,closeApp,stopDate,distanceTolerance,mode,aimCoordLat,aimCoordLong,aggressive];
 
         exec(successCallback, errorCallback, "Reminder", "start", args);
     },
@@ -84,9 +86,16 @@ module.exports = {
      @params
 
      successCallback: Function
-     @param accurancy:integer
-     @param provider_enabled:boolean
-     @param out_of_service:boolean
+     @param coords:object
+         @param accurancy:integer
+         @param latitude:integer
+         @param longitude:integer
+         @param heading:float
+         @param altitude:float
+         @param speed:float
+         @param provider_enabled:boolean
+         @param out_of_service:boolean
+     @param timestamp:integer
 
      errorCallback: Function
      */
