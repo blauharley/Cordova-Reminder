@@ -384,6 +384,10 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		float distanceStep = lastloc.distanceTo(location);
 		boolean isStanding = goToHold;
 
+		if(distanceStep < distanceTolerance){
+			return;
+		}
+		
         /*
         * has user exceeded radius in meter within a certain time-interval
         */

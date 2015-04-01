@@ -52,7 +52,7 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications base
 
 	     </ul>
          </li>
-         <li><b><i>distanceTolerance</i></b> must be a Number to omit possibly fluctuations, by default all little distance-alterations are taken into consideration. </br><b>default: 10</b></li>
+         <li><b><i>distanceTolerance</i></b> must be a Number to omit possibly fluctuations, by default all distance-alterations that fall below 10 meter are taken into consideration with all modes. </br><b>default: 10</b></li>
 	  <li><b><i>aimCoord</i></b> must be an Object that holds latitude and longitude to determine aim/destination coordinates. </br><b>default: latitude 0, longitude 0</b></li>
           <li><b><i>title</i></b> must be a String to be shown as title within Reminder-Notification, </br><b>default: "Reminder-Notification"</b></li>
 	  <li><b><i>content</i></b> must be a String to be shown as content-text within a Reminder-Notification. Within content there can be a #ML-Notation(linear-distance) that is replaced by the actual gone meters and #MR(radius-distance) for instance "You went #ML meters! within a radius of #MR" is shown within a Reminder-Notification where #ML/#MR are Numbers representing linear/radius-distance.</br> <b>default: "Reminder-Content"</b></li>
