@@ -132,6 +132,7 @@ public class ReminderService extends Service implements LocationListener, Notifi
 							locationManager.requestLocationUpdates(PROVIDER, 0, 0, thisObj);
 						}
 						else{
+							warmUpTime = 0;
 		        			locationManager.requestLocationUpdates(PROVIDER, interval, 0, thisObj);
 						}
 						
@@ -277,9 +278,10 @@ public class ReminderService extends Service implements LocationListener, Notifi
 			return;
 		}
 		
-		if(!timeWarmUpOut()){
+		if(!timeWarmUpOut() || warmUpTime == 0){
 			startLoc.set(location);
 			lastloc.set(location);
+			warmUpTime = -1;
 			return;
 		}
 		
