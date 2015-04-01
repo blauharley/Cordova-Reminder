@@ -42,10 +42,10 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications base
                   required properties:
 		  <ul>
 		     <li>
-                        <b><i>speedMsTolerance</i></b> is considered how fast an user has to go in meter per seconds in order to be determined they come to a stop or they still move.
+                        <b><i>distance</i></b> is considered to be the radius an user has to exceed or fall below to be notified by Reminder-Notifications.
 		     </li>
                      <li>
-                        <b><i>interval</i></b> is considered how fast an user has to change stop/go movements in milliseconds.
+                        <b><i>interval</i></b> is considered how often a geolocation measure is executed
 		     </li>
 		  </ul>
 		</li>
@@ -115,7 +115,7 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications base
 
 ```
 
-<p><b><i>"status"</i></b>: All 45 seconds it is tested whether an user goes slower than 4 meter per second a Reminder-Notification is shown</p>
+<p><b><i>"status"</i></b>: All 45 seconds it is tested whether an user exceeded or fell below 100 meter distance.</p>
 
 ```javascript
 
@@ -130,7 +130,7 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications base
     mode: "status",
     // required properties
     interval: 45000,
-    speedMsTolerance: 4
+    distance: 100
  });
 
 ```
