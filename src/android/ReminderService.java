@@ -60,7 +60,7 @@ public class ReminderService extends Service implements LocationListener, Notifi
 
 	private boolean locSubscribed = false;
 
-	private boolean goToHold = true;
+	private boolean goToHold = false;
     
 	// wait at the beginning
 	private long startTime;
@@ -400,8 +400,7 @@ public class ReminderService extends Service implements LocationListener, Notifi
 			linearDistance = 0;
 			currentMsTime = System.currentTimeMillis();
             startTime = currentMsTime;
-			goToHold = isStanding;
-
+            
 		}
 
 	}
