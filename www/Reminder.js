@@ -31,15 +31,19 @@ module.exports = {
      successCallback: Function
      errorCallback: Function
      options:{
+         mode: "aim"
          title : "Reminder-Notification"
          content: "Reminder-Content"
          interval: 60000 (in milliseconds)
          distance: 100 (in meters)
+         aimCoord:{
+            lat: 0,
+            long: 0
+         }
          whistle: true
          closeApp: true
          stopDate: "forever" ("forever" | "tomorrow")
          distanceTolerance: 10
-         speedMsTolerance: 10
          aggressive: true
      }
      */
