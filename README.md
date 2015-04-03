@@ -71,7 +71,7 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications base
 
 <h4>A Reminder-Notification example of all modes:</h4>
 
-<p><b><i>"aim"</i></b>: When a user has reached a certain aim/destination whithin 30 meters and 1 minute has passed(default) a Reminder-Notification is shown</p>
+<p><b><i>"aim"</i></b>: When a user has reached a certain aim/destination whithin 30 meters and 1 minute has passed(default) since it has been started a Reminder-Notification is shown. This measurement is done in a lazy way(aggressive off).</p>
 
 ```javascript
 
@@ -89,12 +89,13 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications base
         lat:40.97989806,
         long:-95.2734375
     },
-    distanceTolerance: 30
+    distanceTolerance: 30,
+    aggressive: false
  });
 
 ```
 
-<p><b><i>"track"</i></b>: When an user has gone 150 meter and 10 seconds have passed a Reminder-Notification is shown and do not take 10 meter movement fluctuation into consideration</p>
+<p><b><i>"track"</i></b>: When an user has gone 150 meter and 10 seconds have passed a Reminder-Notification is shown and do not take 10 meter movement fluctuation into consideration. This measurement is done in an aggressive way so current locations are queried all the time(aggressive on).</p>
 
 ```javascript
 
@@ -115,7 +116,7 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications base
 
 ```
 
-<p><b><i>"status"</i></b>: All 45 seconds it is tested whether an user exceeded or fell below 100 meter distance.</p>
+<p><b><i>"status"</i></b>: All 45 seconds it is tested whether an user exceeded or fell below 100 meter distance.This measurement is done in a lazy way(aggressive off)</p>
 
 ```javascript
 
@@ -126,11 +127,12 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications base
     console.log("Reminder error",e);
  },{
     title: "Reminder",
-    content: "You have come to a stop while you have gone #ML in meter!",
+    content: "You have come to a stop while you have gone #MR in meter!",
     mode: "status",
     // required properties
     interval: 45000,
-    distance: 100
+    distance: 100,
+    aggressive: false
  });
 
 ```
