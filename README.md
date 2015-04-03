@@ -38,14 +38,14 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications base
 		</li>
 
 		<li>
-                  "status": show Reminder-Notifcation when an user comes to a stop</br>
+                  "status": show Reminder-Notifcation when an user comes to a stop so fell below or exceeded a certain gone distance per time. Either way it is tested whether movement status has changed(go/stop | stop/go) for a Reminder-Notification is shown.</br>
                   required properties:
 		  <ul>
 		     <li>
-                        <b><i>distance</i></b> is considered to be the radius an user has to exceed or fall below to be notified by Reminder-Notifications.
+                        <b><i>distance</i></b> is considered to be the radius an user has to exceed or fall below to be notified by Reminder-Notifications. 
 		     </li>
                      <li>
-                        <b><i>interval</i></b> is considered how often a geolocation measure is executed
+                        <b><i>interval</i></b> is considered how often a geolocation measure is executed.
 		     </li>
 		  </ul>
 		</li>
