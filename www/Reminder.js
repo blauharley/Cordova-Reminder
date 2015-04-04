@@ -60,7 +60,7 @@ module.exports = {
         var stopDate = options.stopDate != undefined ? (options.stopDate == "tomorrow" ? "tomorrow" : "forever") : "forever";
 
         var mode = options.mode != undefined ? (options.mode == "aim" ? options.mode : (options.mode == "track" ? "track" : "status")) : "aim";
-        var aggressive = options.aggressive != undefined ? options.aggressive : true;
+        var aggressive = mode == "status" ? false :(options.aggressive != undefined ? options.aggressive : true);
         var distanceTolerance = options.distanceTolerance != undefined ? options.distanceTolerance : 10;
         var aimCoordLat = mode == "aim" ? (options.aimCoord != undefined ? options.aimCoord.lat : 0) : 0;
         var aimCoordLong = mode == "aim" ? (options.aimCoord != undefined ? options.aimCoord.long : 0) : 0;
