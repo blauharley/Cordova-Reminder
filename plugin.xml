@@ -2,7 +2,7 @@
 
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
         id="com.phonegap.reminder"
-        version="0.9.0">
+        version="0.9.7">
     <name>ReminderPlugin</name>
 
     <js-module src="www/Reminder.js" name="Reminder">
@@ -45,5 +45,29 @@
 		
     </platform>
 
+    <!-- wp8 -->
+    <platform name="wp8">
+
+        <config-file target="config.xml" parent="/*">
+            <feature name="Reminder">
+                <param name="wp-package" value="Reminder" onload="true" />
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <config-file target="Properties/WMAppManifest.xml" parent="/Deployment/App/Tasks/DefaultTask">
+            <BackgroundExecution>
+                <ExecutionType Name="LocationTracking" />
+            </BackgroundExecution>
+        </config-file>
+
+        <config-file target="Properties/WMAppManifest.xml" parent="/Deployment/App/Capabilities">
+            <Capability Name="ID_CAP_LOCATION" />
+        </config-file>
+
+        <source-file src="src/wp8/Reminder.cs" />
+        <source-file src="src/wp8/ExtensionMethods.cs" />
+
+    </platform>
 
 </plugin>

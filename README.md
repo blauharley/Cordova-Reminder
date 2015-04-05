@@ -219,6 +219,7 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications base
 
 <ul>
   <li>Android(Jelly Bean, Version: >= 4.1, API: >= 16)</li>
+  <li>Windows Phone 8 (WP8)</li>
 </ul>
 
 <h3>License:</h3>
