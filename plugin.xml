@@ -67,6 +67,7 @@
 
         <source-file src="src/wp8/Reminder.cs" />
         <source-file src="src/wp8/ExtensionMethods.cs" />
+	<source-file src="src/wp8/whistle.wav" />
 
     </platform>
 

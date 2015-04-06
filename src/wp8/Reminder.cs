@@ -64,7 +64,13 @@ namespace Cordova.Extension.Commands
         private string ConfigureCallbackToken { get; set; }
 
         public static Geolocator Geolocator { get; set; }
+
         public static bool RunningInBackground { get; set; }
+
+        private static Version TargetVersion = new Version(8, 0, 10492);
+
+        public static bool IsTargetedVersion { get { return Environment.OSVersion.Version >= TargetVersion; } }
+
 
         public Reminder()
         {
@@ -325,8 +331,32 @@ namespace Cordova.Extension.Commands
                 Title = title,
                 Content = content.Replace("#ML",linearDistance.ToString()).Replace("#MR",radiusDistance.ToString())
             };
+
+            // does phone support reflection
+            if (IsTargetedVersion)
+            {
+                if (whistle)
+                {
+                    string audioPath = BaseCommand.GetBaseURL() + "Plugins/com.phonegap.reminder/whistle.wav";
+                    SetProperty(toast, "Sound", new Uri(audioPath, UriKind.RelativeOrAbsolute));
+                }
+                else
+                {
+                    SetProperty(toast, "Sound", new Uri("", UriKind.RelativeOrAbsolute));
+                }
+            }
+
             toast.Show();
+
         }
+
+        // Function for setting a property value using reflection.
+        private static void SetProperty(object instance, string name, object value)
+        {
+            var setMethod = instance.GetType().GetProperty(name).GetSetMethod();
+            setMethod.Invoke(instance, new object[] { value });
+        }
+
 
         private async void updateCoordinates()
         {
