@@ -33,8 +33,6 @@ namespace Cordova.Extension.Commands
 
         public bool whistle;
 
-        public bool closeApp;
-
         public string stopDate;
 
         public double distanceTolerance;
@@ -88,7 +86,6 @@ namespace Cordova.Extension.Commands
                 double.TryParse(opts[3], out distance);
                 uint.TryParse(opts[2], out interval);
                 bool.TryParse(opts[4], out whistle);
-                bool.TryParse(opts[5], out closeApp);
                 stopDate = opts[6];
                 double.TryParse(opts[7], out distanceTolerance);
                 double.TryParse(opts[9], System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out aimCoordLat);
@@ -121,11 +118,6 @@ namespace Cordova.Extension.Commands
                 startTime = unixEpoch.ToJavaScriptMilliseconds();
 
                 startGeolocator();
-
-                if (closeApp)
-                {
-                    Application.Current.Terminate();
-                }
 
             }
             catch (Exception e)

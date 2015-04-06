@@ -60,7 +60,7 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications base
 	  <li><b><i>distance</i></b> must be a Number in Meter to be reached to show a Reminder-Notification, </br><b>default: 100</b></li>
 	  <li><b><i>aggressive</i></b> must be a Boolean to determine whether geolocation measurement of modes "aim" and "track" should be executed aggressively or not. When "status" mode is used this option is set to <b>false</b>, </br><b>default: true</b></li>
 	  <li><b><i>whistle</i></b> must be a Boolean to enable/disable Whistle-Sound, </br><b>default: true</b></li>
-	  <li><b><i>closeApp</i></b> must be a Boolean to-close/not-to-close App, </br><b>default: true</b></li>
+	  <li><b><i>closeApp</i></b> must be a Boolean to-close/not-to-close App. This option is not supported by WP8. </br><b>default: true</b></li>
 	  <li><b><i>stopDate</i></b> must be a String to indicate Reminder should run forever or being stopped next Day, ("forever" | "tomorrow") </br><b>default: "forever"</b></li>
 	</ul>
   </p>
