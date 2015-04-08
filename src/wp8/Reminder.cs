@@ -20,7 +20,7 @@ namespace Cordova.Extension.Commands
         private static string STOP_SERVICE_DATE_FOREVER = "forever";
         private static string STOP_SERVICE_DATE_TOMORROW = "tomorrow";
 
-        
+
         public string mode;
 
         public string title;
@@ -44,8 +44,9 @@ namespace Cordova.Extension.Commands
         public bool aggressive;
 
 
-        
+
         private Int32 warmUpTime = 5000;
+        private UInt32 locationRequestTimeout = 60 * 1000;
         private bool isProviderRequest = false;
 
         private long startTime;
@@ -71,11 +72,48 @@ namespace Cordova.Extension.Commands
 
         public static bool IsTargetedVersion { get { return Environment.OSVersion.Version >= TargetVersion; } }
 
+        public class ReminderGeoCoordinate : GeoCoordinate
+        {
+
+            public bool providerEnabled { get; set; }
+            public PositionStatus providerStatus { get; set; }
+
+            public ReminderGeoCoordinate()
+            {
+                this.providerEnabled = true;
+            }
+
+            public ReminderGeoCoordinate(GeoCoordinate obj)
+            {
+                this.HorizontalAccuracy = obj.HorizontalAccuracy;
+                this.Altitude = obj.Altitude;
+                this.Course = obj.Course;
+                this.Latitude = obj.Latitude;
+                this.Longitude = obj.Longitude;
+                this.Speed = obj.Speed;
+                this.providerEnabled = true;
+            }
+
+            public void copyValues(GeoCoordinate obj)
+            {
+                this.HorizontalAccuracy = obj.HorizontalAccuracy;
+                this.Altitude = obj.Altitude;
+                this.Course = obj.Course;
+                this.Latitude = obj.Latitude;
+                this.Longitude = obj.Longitude;
+                this.Speed = obj.Speed;
+            }
+
+        }
+
+        private ReminderGeoCoordinate requestedCoordInfo;
+
 
         public Reminder()
         {
             radiusDistance = 0;
             linearDistance = 0;
+            requestedCoordInfo = new ReminderGeoCoordinate();
             currentMsTime = (new DateTime()).Millisecond;
         }
 
@@ -97,13 +135,14 @@ namespace Cordova.Extension.Commands
                 double.TryParse(opts[9], System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out aimCoordLat);
                 double.TryParse(opts[10], System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out aimCoordLong);
                 bool.TryParse(opts[11], out aggressive);
-                
+
+                DateTime now = new DateTime();
+
                 if (stopDate.Equals(STOP_SERVICE_DATE_TOMORROW, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    DateTime now = new DateTime();
                     stopServiceDate = now.Day;
                 }
-                
+
                 if (mode.Equals(AIM_MODE, StringComparison.InvariantCultureIgnoreCase))
                 {
                     aimLoc = new GeoCoordinate(aimCoordLat, aimCoordLong);
@@ -120,8 +159,7 @@ namespace Cordova.Extension.Commands
 
                 stopGeolocatorIfActive();
 
-                DateTime unixEpoch = new DateTime();
-                startTime = unixEpoch.ToJavaScriptMilliseconds();
+                startTime = now.Millisecond;
 
                 startGeolocator();
 
@@ -161,14 +199,14 @@ namespace Cordova.Extension.Commands
             {
                 startGeolocator();
             }
-            
+
             updateCoordinates();
 
             if (!wasStarted)
             {
                 stopGeolocatorIfActive();
             }
-            
+
         }
 
         /*
@@ -182,19 +220,22 @@ namespace Cordova.Extension.Commands
             {
                 MovementThreshold = 0,
                 ReportInterval = aggressive ? 0 : interval,
-                DesiredAccuracyInMeters = 100
+                DesiredAccuracyInMeters = 100,
             };
 
             updateCoordinates();
 
             Geolocator.PositionChanged += OnGeolocatorOnPositionChanged;
-            RunningInBackground = true; 
+            Geolocator.StatusChanged += OnGeolocatorStatusChanged;
+
+            RunningInBackground = true;
         }
 
         private void stopGeolocatorIfActive()
         {
             if (Geolocator == null) return;
             Geolocator.PositionChanged -= OnGeolocatorOnPositionChanged;
+            Geolocator.StatusChanged -= OnGeolocatorStatusChanged;
             Geolocator = null;
         }
 
@@ -205,7 +246,7 @@ namespace Cordova.Extension.Commands
                 dispatchMessage(PluginResult.Status.ERROR, string.Format("OnGeolocatorOnPositionChanged-Error: {0}!", Geolocator.LocationStatus), true, ConfigureCallbackToken);
                 return;
             }
-            
+
             if (handleServiceStop())
             {
                 stopGeolocatorIfActive();
@@ -217,7 +258,7 @@ namespace Cordova.Extension.Commands
             double _long = currLoc.Longitude;
 
             GeoCoordinate location = new GeoCoordinate(_lat, _long);
-            
+
             if (!warmUpTimeOut() || warmUpTime == 0)
             {
                 startLoc = location;
@@ -225,7 +266,7 @@ namespace Cordova.Extension.Commands
                 warmUpTime = -1;
                 return;
             }
-            
+
 
             if (mode.Equals(AIM_MODE, StringComparison.InvariantCultureIgnoreCase))
             {
@@ -239,6 +280,42 @@ namespace Cordova.Extension.Commands
             {
                 handleStatusModeByLocation(location);
             }
+
+        }
+
+        private void OnGeolocatorStatusChanged(Geolocator sender, StatusChangedEventArgs args)
+        {
+            switch (args.Status)
+            {
+                case PositionStatus.Disabled:
+                    // the application does not have the right capability or the location master switch is off
+                    requestedCoordInfo.providerEnabled = false;
+                    break;
+                case PositionStatus.Initializing:
+                    // the geolocator started the tracking operation
+                    requestedCoordInfo.providerEnabled = true;
+                    break;
+                case PositionStatus.NoData:
+                    // the location service was not able to acquire the location
+                    break;
+                case PositionStatus.Ready:
+                    // the location service is generating geopositions as specified by the tracking parameters
+                    requestedCoordInfo.providerEnabled = true;
+                    break;
+                case PositionStatus.NotAvailable:
+                    // not used in WindowsPhone, Windows desktop uses this value to signal that there is no hardware capable to acquire location information
+                    break;
+                case PositionStatus.NotInitialized:
+                    // the initial state of the geolocator, once the tracking operation is stopped by the user the geolocator moves back to this state
+                    break;
+            }
+
+            requestedCoordInfo.providerStatus = args.Status;
+
+        }
+
+        private void setProviderInfo()
+        {
 
         }
 
@@ -329,7 +406,7 @@ namespace Cordova.Extension.Commands
             var toast = new ShellToast
             {
                 Title = title,
-                Content = content.Replace("#ML",linearDistance.ToString()).Replace("#MR",radiusDistance.ToString())
+                Content = content.Replace("#ML", linearDistance.ToString()).Replace("#MR", radiusDistance.ToString())
             };
 
             // does phone support reflection
@@ -362,10 +439,7 @@ namespace Cordova.Extension.Commands
         {
             try
             {
-                Geoposition geoposition = await Geolocator.GetGeopositionAsync(
-                    //maximumAge: TimeSpan.FromMinutes(10),
-                    //timeout: TimeSpan.FromSeconds(0)
-                );
+                Geoposition geoposition = await Geolocator.GetGeopositionAsync();
 
                 Geocoordinate coord = geoposition.Coordinate;
                 double _lat = coord.Latitude;
@@ -375,7 +449,8 @@ namespace Cordova.Extension.Commands
 
                 if (isProviderRequest)
                 {
-                    var callbackJsonResult = currLoc.ToJson();
+                    requestedCoordInfo.copyValues(currLoc);
+                    var callbackJsonResult = requestedCoordInfo.ToJson();
                     dispatchMessage(PluginResult.Status.OK, callbackJsonResult, true, ConfigureCallbackToken);
                 }
 

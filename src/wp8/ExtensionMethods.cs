@@ -6,9 +6,8 @@ namespace Cordova.Extension.Commands
 {
     public static class ExtensionMethods
     {
-        public static string ToJson(this GeoCoordinate geocoordinate)
+        public static string ToJson(this Cordova.Extension.Commands.Reminder.ReminderGeoCoordinate geocoordinate)
         {
-            DateTime now = new DateTime();
             var numberFormatInfo = (NumberFormatInfo)NumberFormatInfo.CurrentInfo.Clone();
             numberFormatInfo.NaNSymbol = "0";
             numberFormatInfo.NumberDecimalSeparator = ".";
@@ -20,10 +19,10 @@ namespace Cordova.Extension.Commands
                     "\"altitude\": {3}," +
                     "\"heading\": {4}," +
                     "\"speed\": {5}," +
-                    "\"provider_enabled\": true," +
-                    "\"out_of_service\": false" +
+                    "\"provider_enabled\": {6}," +
+                    "\"out_of_service\": {7}" +
                 "}}" +
-                "\"timestamp\": {6}" +
+                "\"timestamp\": {8}" +
             "}}"
             , geocoordinate.HorizontalAccuracy.ToString(numberFormatInfo)
             , geocoordinate.Latitude.ToString(numberFormatInfo)
@@ -31,14 +30,10 @@ namespace Cordova.Extension.Commands
             , geocoordinate.GetType().GetMethod("Altitude") != null ? geocoordinate.Altitude.ToString(numberFormatInfo) : "0"
             , geocoordinate.GetType().GetMethod("Course") != null ? geocoordinate.Course.ToString(numberFormatInfo) : "0"
             , geocoordinate.GetType().GetMethod("Speed") != null ? geocoordinate.Speed.ToString(numberFormatInfo) : "0"
-            , -now.ToJavaScriptMilliseconds());
+            , geocoordinate.providerEnabled
+            , geocoordinate.providerStatus == PositionStatus.Disabled || geocoordinate.providerStatus == PositionStatus.NotAvailable
+            , ((DateTime.Now.Ticks - new DateTime(1970, 1, 1).Ticks) / TimeSpan.TicksPerSecond)*1000);
         }
-        public static long ToJavaScriptMilliseconds(this DateTime dt)
-        {
-            return (long)dt
-            .ToUniversalTime()
-            .Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc))
-            .TotalMilliseconds;
-        }
+
     }
 }

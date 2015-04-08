@@ -36,7 +36,7 @@ public class ReminderService extends Service implements LocationListener, Notifi
 
 	private Location startLoc;
 	private Location lastloc;
-	private LocationManager locationManager;
+	private LocationManager locationManager = null;
 
 	private String title;
 	private String content;
@@ -55,9 +55,8 @@ public class ReminderService extends Service implements LocationListener, Notifi
 	private long currentMsTime;
 	private int stopServiceDate = -1;
 
-	private Handler mUserLocationHandler = null;
-	private Thread triggerService = null;
-
+	private Handler serviceHandler = null;
+	
 	private boolean locSubscribed = false;
 
 	private boolean goToHold = false;
@@ -65,7 +64,17 @@ public class ReminderService extends Service implements LocationListener, Notifi
 	// wait at the beginning
 	private long startTime;
 	private long warmUpTime = 5000;
-
+	
+	private int locationRequestTimeout = 1000*60;
+	
+	class timer implements Runnable {
+          public void run() {
+            
+            attachToLocationUpdates();
+            
+          }
+    }
+    
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 
@@ -105,50 +114,12 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		startTime = System.currentTimeMillis();
 		currentMsTime = startTime;
 
-		final ReminderService thisObj = this;
-
-		triggerService = new Thread(new Runnable(){
-			@TargetApi(16)
-	        public void run(){
-	            try{
-
-	                Looper.prepare();
-
-	                if(isRunning() && !locSubscribed){
-
-	                	locSubscribed = true;
-
-		                mUserLocationHandler = new Handler();
-
-		                Criteria c = new Criteria();
-		                c.setAccuracy(Criteria.ACCURACY_COARSE);
-		                c.setHorizontalAccuracy(DESIRED_LOCATION_ACCURANCY_HIGH);
-		                c.setPowerRequirement(Criteria.POWER_HIGH);
-		                
-		                locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-		                final String PROVIDER = locationManager.getBestProvider(c, true);
-						
-						if(aggressive){
-							locationManager.requestLocationUpdates(PROVIDER, 0, 0, thisObj);
-						}
-						else{
-							warmUpTime = 0;
-		        			locationManager.requestLocationUpdates(PROVIDER, interval, 0, thisObj);
-						}
-						
-	                }
-
-	                Looper.loop();
-
-	            }catch(Exception ex){
-	            	
-	            }
-	        }
-	    }, "LocationThread");
-
+		serviceHandler = new Handler();
+        serviceHandler.postDelayed( new timer(),locationRequestTimeout);
+        
+		attachToLocationUpdates();
+		
 	    setRunning(true);
-	    
-	    triggerService.start();
 	    
 	    return START_REDELIVER_INTENT;
 
@@ -183,6 +154,38 @@ public class ReminderService extends Service implements LocationListener, Notifi
 	    editor.apply();
 	}
 	
+	private void attachToLocationUpdates(){
+		
+		if(locationManager != null){
+			locationManager.removeUpdates(this);	
+		}
+		
+		if(!isRunning()){
+        	return;
+        }
+        
+		Criteria c = new Criteria();
+        c.setAccuracy(Criteria.ACCURACY_LOW);
+        c.setHorizontalAccuracy(DESIRED_LOCATION_ACCURANCY_MEDIUM);
+        c.setPowerRequirement(Criteria.POWER_HIGH);
+        
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        final String PROVIDER = locationManager.getBestProvider(c, true);
+        
+		locationManager.removeUpdates(this);	
+		
+		if(aggressive){
+			locationManager.requestLocationUpdates(PROVIDER, 0, 0, this);
+		}
+		else{
+			if(warmUpTime != -1){
+				warmUpTime = 0;	
+			}
+			locationManager.requestLocationUpdates(PROVIDER, interval, 0, this);
+		}
+		
+	}
+	
 	private void makeWhistle(){
 		Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 	    Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
@@ -203,7 +206,7 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		return stopServiceDate != -1 && stopServiceDate != currDay;	
 	}
 	
-	private void cleanUp() {
+	private synchronized void cleanUp() {
 
 		PackageManager pm = getPackageManager();
 		Intent callingIntent = pm.getLaunchIntentForPackage(getApplicationContext().getPackageName());
@@ -211,14 +214,12 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		NotificationManager mNotificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
 		mNotificationManager.cancel(NOTIFICATION_ID);
 		
-		locationManager.removeUpdates(this);
-
-		if(mUserLocationHandler != null){
-			mUserLocationHandler.getLooper().quit();
+		if(locationManager != null){
+			locationManager.removeUpdates(this);
 		}
-
-		triggerService.interrupt();
-
+		
+		setRunning(false);
+		
 	}
 
 	@TargetApi(16)
@@ -273,10 +274,14 @@ public class ReminderService extends Service implements LocationListener, Notifi
 	@Override
 	public void onLocationChanged(Location location) {
 		
+		serviceHandler.removeCallbacksAndMessages(null);
+		
 		if(handleServiceStop()){
 			stopSelf();
 			return;
 		}
+		
+		serviceHandler.postDelayed( new timer(),locationRequestTimeout);
 		
 		if(!timeWarmUpOut() || warmUpTime == 0){
 			startLoc.set(location);
@@ -294,7 +299,7 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		else if(mode.equalsIgnoreCase(STATUS_MODE)){
 			handleStatusModeByLocation(location);
 		}
-
+		
 	}
 
 	@Override
@@ -328,7 +333,7 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		/*
 		 * show notification when user has entered aim area
 		 */
-		if( distanceToAim < distanceTolerance && (!aggressive || (aggressive && timeOut()) ) ){
+		if( distanceToAim < distanceTolerance && timeOut()){
 
 			startLoc.set(location);
 
@@ -354,7 +359,7 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		/*
 		 * show notification when time and distance is reached
 		 */
-		if( linearDistance >= distance && (!aggressive || (aggressive && timeOut()) ) ){
+		if( linearDistance >= distance && timeOut()){
 
 			startLoc.set(location);
 
@@ -387,7 +392,7 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		/*
 		 * show notification when user's movement status changed
 		 */
-		if(isStanding != goToHold && (!aggressive || (aggressive && timeOut()) )){
+		if(isStanding != goToHold && timeOut()){
 
 			startLoc.set(location);
 

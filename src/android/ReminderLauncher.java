@@ -169,8 +169,8 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 	private void requestLocationAccurancy(){
 		
 		Criteria c = new Criteria();
-        c.setAccuracy(Criteria.ACCURACY_COARSE);
-        c.setHorizontalAccuracy(DESIRED_LOCATION_ACCURANCY_HIGH);
+        c.setAccuracy(Criteria.ACCURACY_LOW);
+        c.setHorizontalAccuracy(DESIRED_LOCATION_ACCURANCY_MEDIUM);
         c.setPowerRequirement(Criteria.POWER_HIGH);
 
         locationManager = (LocationManager) thisAct.getSystemService(Context.LOCATION_SERVICE);
