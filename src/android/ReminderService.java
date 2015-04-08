@@ -286,10 +286,17 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		serviceHandler.postDelayed( new timer(),interval+locationRequestTimeout);
 		
 		if(!timeWarmUpOut() || warmUpTime == 0){
+			
 			startLoc.set(location);
 			lastloc.set(location);
-			warmUpTime = -1;
-			return;
+			
+			if(warmUpTime == 0){
+				warmUpTime = -1;
+			}
+			else{
+				return;
+			}
+			
 		}
 		
 		if(mode.equalsIgnoreCase(AIM_MODE)){
