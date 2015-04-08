@@ -70,6 +70,8 @@ public class ReminderService extends Service implements LocationListener, Notifi
 	class timer implements Runnable {
           public void run() {
             
+            serviceHandler.postDelayed( new timer(),interval+locationRequestTimeout);
+            
             attachToLocationUpdates();
             
           }
@@ -115,7 +117,7 @@ public class ReminderService extends Service implements LocationListener, Notifi
 		currentMsTime = startTime;
 
 		serviceHandler = new Handler();
-        serviceHandler.postDelayed( new timer(),locationRequestTimeout);
+        serviceHandler.postDelayed( new timer(),interval+locationRequestTimeout);
         
 		attachToLocationUpdates();
 		
@@ -281,7 +283,7 @@ public class ReminderService extends Service implements LocationListener, Notifi
 			return;
 		}
 		
-		serviceHandler.postDelayed( new timer(),locationRequestTimeout);
+		serviceHandler.postDelayed( new timer(),interval+locationRequestTimeout);
 		
 		if(!timeWarmUpOut() || warmUpTime == 0){
 			startLoc.set(location);
