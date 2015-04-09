@@ -210,6 +210,8 @@ public class ReminderService extends Service implements LocationListener, Notifi
 	
 	private synchronized void cleanUp() {
 
+		serviceHandler.removeCallbacksAndMessages(null);
+		
 		PackageManager pm = getPackageManager();
 		Intent callingIntent = pm.getLaunchIntentForPackage(getApplicationContext().getPackageName());
 		

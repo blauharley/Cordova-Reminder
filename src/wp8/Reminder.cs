@@ -263,8 +263,16 @@ namespace Cordova.Extension.Commands
             {
                 startLoc = location;
                 lastLoc = location;
-                warmUpTime = -1;
-                return;
+
+                if (warmUpTime == 0)
+                {
+                    warmUpTime = -1;
+                }
+                else
+                {
+                    return;
+                }
+                
             }
 
 

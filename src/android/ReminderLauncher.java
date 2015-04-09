@@ -89,6 +89,10 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 				aimLat = (float)args.getDouble(9);
 				aimLong = (float)args.getDouble(10);
 				
+				if(isRunning()){
+					stopReminderService();
+				}
+				
 				startReminderService();
 				return true;
 			}
