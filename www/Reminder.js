@@ -97,6 +97,7 @@ module.exports = {
          @param heading:float
          @param altitude:float
          @param speed:float
+         @param gps_fix:boolean
          @param provider_enabled:boolean
          @param out_of_service:boolean
      @param timestamp:integer

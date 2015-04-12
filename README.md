@@ -194,7 +194,7 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications base
 
   <p><b>Reminder.requestProvider( out success:Function, out error:Function ) : undefined</b></p>
 
-  <p>@param <b><i>success</i></b> must be a Function to be called when all went right and a result is returned as <i>Object</i>-parameters containing <i>accurancy</i>, <i>provider_enabled</i> and <i>out_of_service</i></p>
+  <p>@param <b><i>success</i></b> must be a Function to be called when all went right and a result is returned as <i>Object</i>-parameters containing provider infomration (see at example)</p>
   <p>@param <b><i>error</i></b> must be a Function to be called when there has been an error.</p>
 
   <p>@return undefined</p>
@@ -204,10 +204,18 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications base
 ```javascript
 
  Reminder.requestProvider(function(info){
-      console.log("Reminder requestProvider: ",info);
-      console.log("Reminder requestProvider accurancy: ",info.accurancy);
-      console.log("Reminder provider enabled: ",info.provider_enabled);
-      console.log("Reminder out of service: ",info.out_of_service);	
+      console.log("Reminder requestProvider: ",info);	
+      console.log("Reminder accurancy: ",info.coords.accurancy);	
+      console.log("Reminder latitude: ",info.coords.latitude);	
+      console.log("Reminder longitude: ",info.coords.longitude);	
+      console.log("Reminder heading: ",info.coords.heading);
+      console.log("Reminder altitude: ",info.coords.altitude);
+      console.log("Reminder speed: ",info.coords.speed);	
+      console.log("Reminder gps_fix: ",info.coords.gps_fix);
+      console.log("Reminder provider_enabled: ",info.coords.provider_enabled);	
+      console.log("Reminder out_of_service: ",info.coords.out_of_service);
+
+      console.log("Reminder timestamp: ",info.timestamp);	
  },
  function(e){
       console.log("Reminder requestProvider",e);
