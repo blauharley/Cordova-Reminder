@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
@@ -25,9 +26,10 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.location.GpsStatus;
 
 
-public class ReminderLauncher extends CordovaPlugin implements NotificationInterface, RunningInterface, LocationListener{
+public class ReminderLauncher extends CordovaPlugin implements NotificationInterface, RunningInterface, LocationListener, GpsStatus.Listener{
 
 	public static final String ACTION_START = "start";
 	public static final String ACTION_CLEAR = "clear";
@@ -52,12 +54,29 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 	private long warmUpTime = 5000;
 	private LocationManager locationManager;
 	
+	private Handler serviceHandler = null;
+	
 	private boolean providerEnabled = true;
 	private int providerStatus = -1;
+	private Location mLastLocation = null;
+	private long mLastLocationMillis = 0;
+	private boolean isGPSAvailable = false;
+	private GpsStatus gpsStatus = null;
 	
 	private Activity thisAct;
 	private CallbackContext callCtx;
 	
+	class timer implements Runnable {
+          public void run() {
+          	
+          	if(mLastLocation == null || isGPSAvailable == false){
+          		providerStatus = LocationProvider.OUT_OF_SERVICE;
+          		sendProviderResponseByLocation(new Location(getProvider()));
+          	}
+          	
+          }
+    }
+    
 	public boolean execute(String action, JSONArray args, CallbackContext callbackContext) {
 		
 		try {
@@ -170,7 +189,7 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 		thisAct.stopService(mServiceIntent);
 	}
 	
-	private void requestLocationAccurancy(){
+	private String getProvider(){
 		
 		Criteria c = new Criteria();
         c.setAccuracy(Criteria.ACCURACY_LOW);
@@ -178,9 +197,25 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
         c.setPowerRequirement(Criteria.POWER_HIGH);
 
         locationManager = (LocationManager) thisAct.getSystemService(Context.LOCATION_SERVICE);
-        final String PROVIDER = locationManager.getBestProvider(c,true);
-
-        locationManager.requestLocationUpdates(PROVIDER, 0, 0, this);
+        
+        return locationManager.getBestProvider(c,true);
+        
+	}
+	
+	private void requestLocationAccurancy(){
+		
+		String provider = getProvider();
+		
+        locationManager.requestLocationUpdates(provider, 0, 0, this);
+        locationManager.addGpsStatusListener(this);
+        
+        serviceHandler = new Handler();
+        serviceHandler.postDelayed( new timer(),warmUpTime);
+        
+        mLastLocation = null;
+        isGPSAvailable = false;
+        providerEnabled = false;
+        gpsStatus = null;
         
 	}
 	
@@ -200,46 +235,61 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 	
 	public void setRunning(boolean running) {}
 	
+	private void sendProviderResponseByLocation(Location location){
+		
+		try{
+			
+			JSONObject jsonObj = new JSONObject();
+	
+	        JSONObject coords = new JSONObject();
+	        
+	        coords.put("latitude",location.getLatitude());
+	        coords.put("longitude",location.getLongitude());
+	        
+	        coords.put("accurancy", location.getAccuracy());
+	        coords.put("provider_enabled", providerEnabled);
+	        coords.put("gps_fix", isGPSAvailable);
+	        
+	        if(location.hasBearing()){
+	        	coords.put("heading", location.getBearing());	
+	        }
+	        if(location.hasAltitude()){
+	        	coords.put("altitude", location.getAltitude());	
+	        }
+	        if(location.hasSpeed()){
+	        	coords.put("speed", location.getSpeed());	
+	        }
+	        
+	        coords.put("out_of_service", (LocationProvider.OUT_OF_SERVICE == providerStatus ? true : false));
+			
+			jsonObj.put("coords",coords);
+			jsonObj.put("timestamp", System.currentTimeMillis()-gpsStatus.getTimeToFirstFix());
+			
+			callCtx.sendPluginResult(new PluginResult(PluginResult.Status.OK, jsonObj));
+			
+		}
+		catch (JSONException e){
+			callCtx.sendPluginResult(new PluginResult(PluginResult.Status.JSON_EXCEPTION));
+        }
+	}
+	
     @Override
     public void onLocationChanged(Location location) {
+		
+		providerEnabled = true;
+		
+		mLastLocation = location;
+		mLastLocationMillis = System.currentTimeMillis();
 		
 		if(!timeWarmUpOut()){
 			return;
 		}
 		
-		try{
-			
-			JSONObject jsonObj = new JSONObject();
-
-            JSONObject coords = new JSONObject();
-            
-            coords.put("latitude",location.getLatitude());
-            coords.put("longitude",location.getLongitude());
-            
-            coords.put("accurancy", location.getAccuracy());
-            coords.put("provider_enabled", providerEnabled);
-            
-            if(location.hasBearing()){
-            	coords.put("heading", location.getBearing());	
-            }
-            if(location.hasAltitude()){
-            	coords.put("altitude", location.getAltitude());	
-            }
-            if(location.hasSpeed()){
-            	coords.put("speed", location.getSpeed());	
-            }
-            
-            coords.put("out_of_service", (LocationProvider.OUT_OF_SERVICE == providerStatus ? true : false));
-			
-			jsonObj.put("coords",coords);
-			jsonObj.put("timestamp", System.currentTimeMillis());
-			
-			callCtx.sendPluginResult(new PluginResult(PluginResult.Status.OK, jsonObj));
-			
-		}
-        catch (JSONException e){
-			callCtx.sendPluginResult(new PluginResult(PluginResult.Status.JSON_EXCEPTION));
-        }
+		locationManager.removeUpdates(this);
+		locationManager.removeGpsStatusListener(this);
+		
+		sendProviderResponseByLocation(location);
+		
     }
 
     @Override
@@ -257,4 +307,22 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 		providerEnabled = false;
     }
     
+    public void onGpsStatusChanged(int event) {
+    	gpsStatus = locationManager.getGpsStatus(gpsStatus);
+        switch (event) {
+            case GpsStatus.GPS_EVENT_SATELLITE_STATUS:
+            
+                if (mLastLocation != null){
+                    isGPSAvailable = (System.currentTimeMillis() - mLastLocationMillis) < warmUpTime;
+				}
+				else{
+					isGPSAvailable = false;
+				}
+				
+                break;
+            case GpsStatus.GPS_EVENT_FIRST_FIX:
+                isGPSAvailable = true;
+                break;
+        }
+    }
 }
