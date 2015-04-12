@@ -194,7 +194,7 @@ This Cordova-Plugin enables users to get notified by Reminder-Notifications base
 
   <p><b>Reminder.requestProvider( out success:Function, out error:Function ) : undefined</b></p>
 
-  <p>@param <b><i>success</i></b> must be a Function to be called when all went right and a result is returned as <i>Object</i>-parameters containing provider infomration (see at example)</p>
+  <p>@param <b><i>success</i></b> must be a Function to be called when all went right and a result is returned as <i>Object</i>-parameters containing provider information (see at example)</p>
   <p>@param <b><i>error</i></b> must be a Function to be called when there has been an error.</p>
 
   <p>@return undefined</p>

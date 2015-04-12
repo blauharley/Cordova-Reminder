@@ -20,9 +20,10 @@ namespace Cordova.Extension.Commands
                     "\"heading\": {4}," +
                     "\"speed\": {5}," +
                     "\"provider_enabled\": {6}," +
-                    "\"out_of_service\": {7}" +
-                "}}" +
-                "\"timestamp\": {8}" +
+                    "\"out_of_service\": {7}," +
+                    "\"gps_fix\": {8}" +
+                "}}," +
+                "\"timestamp\": {9}" +
             "}}"
             , geocoordinate.HorizontalAccuracy.ToString(numberFormatInfo)
             , geocoordinate.Latitude.ToString(numberFormatInfo)
@@ -32,7 +33,16 @@ namespace Cordova.Extension.Commands
             , geocoordinate.GetType().GetMethod("Speed") != null ? geocoordinate.Speed.ToString(numberFormatInfo) : "0"
             , geocoordinate.providerEnabled
             , geocoordinate.providerStatus == PositionStatus.Disabled || geocoordinate.providerStatus == PositionStatus.NotAvailable
+            , geocoordinate.isGPSAvailable
             , ((DateTime.Now.Ticks - new DateTime(1970, 1, 1).Ticks) / TimeSpan.TicksPerSecond)*1000);
+        }
+
+        public static string toRunningJson(this bool val)
+        {
+            var numberFormatInfo = (NumberFormatInfo)NumberFormatInfo.CurrentInfo.Clone();
+            numberFormatInfo.NaNSymbol = "0";
+            numberFormatInfo.NumberDecimalSeparator = ".";
+            return string.Format("{{ \"isRunning\": {0} }}", val);
         }
 
     }
