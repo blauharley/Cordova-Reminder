@@ -28,6 +28,9 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.location.GpsStatus;
 
+import java.util.List;
+import java.util.Iterator;
+
 
 public class ReminderLauncher extends CordovaPlugin implements NotificationInterface, RunningInterface, LocationListener, GpsStatus.Listener{
 
@@ -51,7 +54,7 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 	
 	// wait at the beginning
 	private long startTime;
-	private long warmUpTime = 5000;
+	private long warmUpTime = 10000;
 	private LocationManager locationManager;
 	
 	private Handler serviceHandler = null;
@@ -71,7 +74,7 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
           	
           	if(mLastLocation == null || isGPSAvailable == false){
           		providerStatus = LocationProvider.OUT_OF_SERVICE;
-          		sendProviderResponseByLocation(new Location(getProvider()));
+          		sendProviderResponseByLocation(new Location(getBestProvider()));
           	}
           	
           }
@@ -189,7 +192,7 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 		thisAct.stopService(mServiceIntent);
 	}
 	
-	private String getProvider(){
+	private String getBestProvider(){
 		
 		Criteria c = new Criteria();
         c.setAccuracy(Criteria.ACCURACY_LOW);
@@ -204,19 +207,33 @@ public class ReminderLauncher extends CordovaPlugin implements NotificationInter
 	
 	private void requestLocationAccurancy(){
 		
-		String provider = getProvider();
+		locationManager = (LocationManager) thisAct.getSystemService(Context.LOCATION_SERVICE);
 		
-        locationManager.requestLocationUpdates(provider, 0, 0, this);
-        locationManager.addGpsStatusListener(this);
-        
-        serviceHandler = new Handler();
-        serviceHandler.postDelayed( new timer(),warmUpTime);
-        
-        mLastLocation = null;
-        isGPSAvailable = false;
-        providerEnabled = false;
-        gpsStatus = null;
-        
+		if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || 
+		   locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER )){
+			
+			List<String> allProviders = locationManager.getAllProviders();
+	        for (String provider: allProviders) {
+	        	locationManager.requestLocationUpdates(provider, 0, 0, this);
+	        }
+	        locationManager.addGpsStatusListener(this);
+	        
+			serviceHandler = new Handler();
+	        serviceHandler.postDelayed( new timer(),warmUpTime);
+	        
+	        mLastLocation = null;
+	        isGPSAvailable = false;
+	        providerEnabled = false;
+	        gpsStatus = null;
+			
+		}
+		else{
+			
+			PluginResult r = new PluginResult(PluginResult.Status.ERROR,"provider is not enabled");
+			callCtx.sendPluginResult(r);
+			
+		}
+		
 	}
 	
 	private boolean timeWarmUpOut(){
